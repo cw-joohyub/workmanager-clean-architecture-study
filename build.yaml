@@ -5,13 +5,15 @@ targets:
         enabled: true
         generate_for:
           include:
-            - lib/application/**_cubit.dart
-            - lib/feature/**/**_cubit.dart
-            - lib/mapper/**/**.dart
             - lib/di/di_objects.dart
+            - lib/usecase/**.dart
+            - lib/data/**/**.dart
 
       injectable_generator|injectable_config_builder:
         enabled: true
         generate_for:
           include:
             - lib/di/di.dart
+
+      json_serializable:
+        enabled: true

@@ -1,19 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:workmanager_clean_architectue_sample/usecase/red_usecase.dart';
+
+import 'di/di.dart';
+
+const redTaskKey = 'red_task';
+const blackTaskKey = 'black_task';
 
 void main() {
+  getItInit();
   WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MyApp());
   Workmanager().initialize(callbackDispatcher, // The top level function, aka callbackDispatcher
       isInDebugMode:
           true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
       );
-  runApp(const MyApp());
 }
 
 @pragma('vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
 void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) {
+  Workmanager().executeTask((task, inputData) async {
     print("Native called background task: $task"); //simpleTask will be emitted here.
+    //TODO(nm-JihunCha): getIt을 여기서 해줘야하나...
+    getItInit();
+
+    switch (task) {
+      case redTaskKey:
+        getIt<RedUsecase>().doSomething();
+        break;
+      case blackTaskKey:
+        print('blackTaskKey');
+        break;
+    }
     return Future.value(true);
   });
 }
@@ -21,7 +39,6 @@ void callbackDispatcher() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -46,12 +63,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +122,11 @@ class _MyHomePageState extends State<MyHomePage> {
         ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
           onPressed: () {
-            Workmanager().registerOneOffTask("task-identifier", "simpleTask");
+            Workmanager().registerOneOffTask(
+              redTaskKey,
+              redTaskKey,
+              constraints: Constraints(networkType: NetworkType.connected),
+            );
           },
           child: Text(
             '+1 to Red (after 1s)',
@@ -121,7 +136,13 @@ class _MyHomePageState extends State<MyHomePage> {
         const SizedBox(height: 20),
         ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
-          onPressed: () {},
+          onPressed: () {
+            Workmanager().registerOneOffTask(
+              blackTaskKey,
+              blackTaskKey,
+              constraints: Constraints(networkType: NetworkType.connected),
+            );
+          },
           child: Text(
             '+1 to Black (after 1s)',
             style: Theme.of(context).textTheme.headlineMedium?.apply(color: Colors.white),
