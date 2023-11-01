@@ -2,20 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
 
 void main() {
-  // Workmanager().initialize(callbackDispatcher, // The top level function, aka callbackDispatcher
-  //     isInDebugMode:
-  //     true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
-  // );
+  WidgetsFlutterBinding.ensureInitialized();
+  Workmanager().initialize(callbackDispatcher, // The top level function, aka callbackDispatcher
+      isInDebugMode:
+          true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+      );
   runApp(const MyApp());
 }
 
-// @pragma('vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
-// void callbackDispatcher() {
-//   Workmanager().executeTask((task, inputData) {
-//     print("Native called background task: $task"); //simpleTask will be emitted here.
-//     return Future.value(true);
-//   });
-// }
+@pragma('vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) {
+    print("Native called background task: $task"); //simpleTask will be emitted here.
+    return Future.value(true);
+  });
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
