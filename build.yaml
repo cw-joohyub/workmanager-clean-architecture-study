@@ -1,0 +1,17 @@
+targets:
+  $default:
+    builders:
+      injectable_generator|injectable_builder:
+        enabled: true
+        generate_for:
+          include:
+            - lib/application/**_cubit.dart
+            - lib/feature/**/**_cubit.dart
+            - lib/mapper/**/**.dart
+            - lib/di/di_objects.dart
+
+      injectable_generator|injectable_config_builder:
+        enabled: true
+        generate_for:
+          include:
+            - lib/di/di.dart
