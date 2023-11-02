@@ -33,18 +33,18 @@ class NumberRepository {
     final String taskKey = color == 'red' ? plusOneToRedTaskKey : plusOneToBlackTaskKey;
     final int logKey = await _logLocalDatasource.addLog(color);
 
-    print ('postPlusOne : $color / $logKey / $taskKey');
+    print('postPlusOne : $color / $logKey / $taskKey');
 
-    Workmanager().registerOneOffTask(taskKey, taskKey,
-        inputData: <String, dynamic>{
-          'logKey': logKey,
-        },
-        // constraints: Constraints(networkType: NetworkType.connected),
-        backoffPolicy: BackoffPolicy.linear,
-        backoffPolicyDelay: const Duration(milliseconds: 100),
-        initialDelay: const Duration(milliseconds: 100),
-        existingWorkPolicy: ExistingWorkPolicy.append,
+    Workmanager().registerOneOffTask(
+      taskKey, taskKey,
+      inputData: <String, dynamic>{
+        'logKey': logKey,
+      },
+      // constraints: Constraints(networkType: NetworkType.connected),
+      backoffPolicy: BackoffPolicy.linear,
+      backoffPolicyDelay: const Duration(milliseconds: 100),
+      initialDelay: const Duration(milliseconds: 100),
+      existingWorkPolicy: ExistingWorkPolicy.append,
     );
   }
-
 }

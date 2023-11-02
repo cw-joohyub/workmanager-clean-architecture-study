@@ -3,10 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:getwidget/components/button/gf_button.dart';
 import 'package:getwidget/size/gf_size.dart';
 import 'package:glass_kit/glass_kit.dart';
+import 'package:workmanager/workmanager.dart';
+import 'package:workmanager_clean_architectue_sample/di/di.dart';
 import 'package:workmanager_clean_architectue_sample/presentation/cubit/work_manager_cubit.dart';
 import 'package:workmanager_clean_architectue_sample/presentation/widget/log_list_tile.dart';
+import 'package:workmanager_clean_architectue_sample/usecase/black_usecase.dart';
+import 'package:workmanager_clean_architectue_sample/usecase/number_usecase.dart';
 
 import '../util/gaps.dart';
+
+const redTaskKey = 'red_task';
+const blackTaskKey = 'black_task';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -14,7 +21,9 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-        create: (BuildContext context) => WorkManagerCubit(),
+        create: (BuildContext context) => WorkManagerCubit(
+              getIt<NumberUsecase>(),
+            ),
         child: BlocBuilder<WorkManagerCubit, WorkManagerState>(
           builder: (BuildContext context, WorkManagerState state) {
             WorkManagerCubit cubit = context.read<WorkManagerCubit>();
@@ -50,10 +59,7 @@ class MainScreen extends StatelessWidget {
           width: 180,
           color: Colors.red,
           gradient: LinearGradient(
-            colors: [
-              Colors.red.withOpacity(0.40),
-              Colors.red.withOpacity(0.10)
-            ],
+            colors: [Colors.red.withOpacity(0.40), Colors.red.withOpacity(0.10)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -71,10 +77,7 @@ class MainScreen extends StatelessWidget {
           child: Center(
             child: Text(
               '${state.redCount}',
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineMedium
-                  ?.apply(color: Colors.white),
+              style: Theme.of(context).textTheme.headlineMedium?.apply(color: Colors.white),
             ),
           ),
         ),
@@ -84,10 +87,7 @@ class MainScreen extends StatelessWidget {
           width: 180,
           color: Colors.black,
           gradient: LinearGradient(
-            colors: [
-              Colors.black.withOpacity(0.40),
-              Colors.black.withOpacity(0.10)
-            ],
+            colors: [Colors.black.withOpacity(0.40), Colors.black.withOpacity(0.10)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -105,10 +105,7 @@ class MainScreen extends StatelessWidget {
           child: Center(
             child: Text(
               '${state.blackCount}',
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineMedium
-                  ?.apply(color: Colors.white),
+              style: Theme.of(context).textTheme.headlineMedium?.apply(color: Colors.white),
             ),
           ),
         ),
@@ -122,10 +119,16 @@ class MainScreen extends StatelessWidget {
       children: [
         GFButton(
           onPressed: () {
+            WorkManagerCubit(getIt<NumberUsecase>()).plusOneNumber('red');
             // Workmanager().registerOneOffTask(
             //   redTaskKey,
             //   redTaskKey,
             //   constraints: Constraints(networkType: NetworkType.connected),
+            //   backoffPolicy: BackoffPolicy.exponential,
+            //   backoffPolicyDelay: const Duration(milliseconds: 100),
+            //   inputData: <String, dynamic>{
+            //     'taskName': 'red',
+            //   },
             // );
           },
           color: Colors.red,
@@ -134,10 +137,16 @@ class MainScreen extends StatelessWidget {
         ),
         GFButton(
           onPressed: () {
+            WorkManagerCubit(getIt<NumberUsecase>()).plusOneNumber('black');
             // Workmanager().registerOneOffTask(
             //   blackTaskKey,
             //   blackTaskKey,
             //   constraints: Constraints(networkType: NetworkType.connected),
+            //   backoffPolicy: BackoffPolicy.exponential,
+            //   backoffPolicyDelay: const Duration(milliseconds: 100),
+            //   inputData: <String, dynamic>{
+            //     'taskName': 'black',
+            //   },
             // );
           },
           color: Colors.black,
@@ -153,10 +162,7 @@ class MainScreen extends StatelessWidget {
       child: ListView(
         children: state.logEvents.map((LogEvent e) {
           return LogListTile(
-              datetime: e.time,
-              retry: e.retry,
-              eventType: e.eventType,
-              isSuccess: e.isSuccess);
+              datetime: e.time, retry: e.retry, eventType: e.eventType, isSuccess: e.isSuccess);
         }).toList(),
       ),
     );
