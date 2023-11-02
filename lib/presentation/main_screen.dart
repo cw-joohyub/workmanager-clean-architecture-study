@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:getwidget/components/button/gf_button.dart';
 import 'package:getwidget/size/gf_size.dart';
 import 'package:glass_kit/glass_kit.dart';
+import 'package:styled_widget/styled_widget.dart';
 import 'package:workmanager_clean_architectue_sample/presentation/cubit/work_manager_cubit.dart';
 import 'package:workmanager_clean_architectue_sample/presentation/widget/log_list_tile.dart';
 
@@ -51,8 +52,8 @@ class MainScreen extends StatelessWidget {
           color: Colors.red,
           gradient: LinearGradient(
             colors: [
-              Colors.red.withOpacity(0.40),
-              Colors.red.withOpacity(0.10)
+              Colors.red.withOpacity(0.60),
+              Colors.red.withOpacity(0.20)
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -75,7 +76,7 @@ class MainScreen extends StatelessWidget {
                   .textTheme
                   .headlineMedium
                   ?.apply(color: Colors.white),
-            ),
+            ).bold(),
           ),
         ),
         GlassContainer(
@@ -85,8 +86,8 @@ class MainScreen extends StatelessWidget {
           color: Colors.black,
           gradient: LinearGradient(
             colors: [
-              Colors.black.withOpacity(0.40),
-              Colors.black.withOpacity(0.10)
+              Colors.black.withOpacity(0.60),
+              Colors.black.withOpacity(0.20)
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,

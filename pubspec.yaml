@@ -51,6 +51,9 @@ dependencies:
   animate_gradient: ^0.0.2+1
   glass_kit: ^3.0.0
 
+  # Plot
+  fl_chart: ^0.64.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
