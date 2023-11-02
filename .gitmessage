@@ -1,0 +1,28 @@
+<Type>: <Subject>
+
+<Body>
+
+<type> : <Jira issue#>
+test:
+
+# --- COMMIT END ---
+# Type must be one of the following
+#       feat: 새로운 기능
+#       fix: 버그 수정
+#       perf: 성능 향상
+#       refactor: '새로운 기능/버그 수정/성능 향상'과 무관한 코드 수정
+#       style: 코드의 동작과는 무관한 수정 (lint, white-space, formatting, missing semi-colons, etc)
+#       build: Build 설정의 변경 또는 의존성 라이브러리 설정
+#       ci: CI 설정 또는 script 변경
+#       docs: Documentation 수정
+#       test: 테스트 코드의 신규 작성 또는 수정
+#       chore: 위의 모든 항목에 속하지 않는 task
+# ------------------
+# 공통 규칙
+#       Commit Message는 영어로 작성한다
+#       제목은 대문자로 시작하고 명령법으로 작성한다.
+#       제목은 마침표로 끝내지 않는다.
+#       본문과 제목에는 빈줄을 넣어서 구분한다.
+#       본문에는 "어떻게" 보다는 "왜"와 "무엇을" 설명한다.
+#       본문에 목록을 나타낼때는 "-"로 시작한다.
+# ------------------
