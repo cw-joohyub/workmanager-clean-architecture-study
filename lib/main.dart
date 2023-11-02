@@ -3,26 +3,25 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
-import 'package:workmanager_clean_architectue_sample/usecase/red_usecase.dart';
+import 'package:workmanager_clean_architectue_sample/presentation/main_screen.dart';
 
 import 'data/repository/number_repository.dart';
 import 'data/work_manager/work_manager.dart';
 import 'di/di.dart';
 
-const redTaskKey = 'red_task';
-const blackTaskKey = 'black_task';
-
 Future<void> main() async {
   getItInit();
   WidgetsFlutterBinding.ensureInitialized();
   await getIt<NumberRepository>().init();
-  Workmanager().initialize(callbackDispatcher, // The top level function, aka callbackDispatcher
+
+  Workmanager().initialize(
+      callbackDispatcher, // The top level function, aka callbackDispatcher
       isInDebugMode:
           true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
       );
-
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -30,12 +29,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MainScreen(),
     );
   }
 }
@@ -176,3 +174,4 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
