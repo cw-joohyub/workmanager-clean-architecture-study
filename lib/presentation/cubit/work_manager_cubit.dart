@@ -35,9 +35,9 @@ class WorkManagerState {
 }
 
 class WorkManagerCubit extends Cubit<WorkManagerState> {
-  final NumberUsecase _redUsecase;
+  final NumberUsecase _numberUsecase;
 
-  WorkManagerCubit(this._redUsecase)
+  WorkManagerCubit(this._numberUsecase)
       : super(WorkManagerState(blackCount: 100, redCount: 150, logEvents: [
           LogEvent(DateTime.now(), 0, EventType.red, true),
           LogEvent(DateTime.now(), 1, EventType.black, false),
@@ -52,12 +52,8 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
         ]));
 
   void plusOneNumber(String color) {
-    _redUsecase.plusOneNumber(color);
-    // emit(WorkManagerState.copyOf(state)..redCount++);
+    _numberUsecase.plusOneNumber(color);
   }
 
-  void addLog(String taskName) {
-    // _redUsecase.addLog(taskName, state)
-    // emit(WorkManagerState.copyOf(state)..logEvents.add(logEvent));
-  }
+  void addLog(String taskName) {}
 }
