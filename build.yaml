@@ -8,6 +8,7 @@ targets:
             - lib/di/di_objects.dart
             - lib/usecase/**.dart
             - lib/data/**/**.dart
+            - lib/presentation/cubit/**.dart
 
       injectable_generator|injectable_config_builder:
         enabled: true
