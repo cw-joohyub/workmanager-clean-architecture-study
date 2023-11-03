@@ -66,6 +66,9 @@ dependencies:
   isar: ^3.1.0+1
   isar_flutter_libs: ^3.1.0+1
 
+  # Plot
+  fl_chart: ^0.64.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

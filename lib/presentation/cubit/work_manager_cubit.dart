@@ -1,7 +1,8 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../usecase/black_usecase.dart';
 import '../../usecase/number_usecase.dart';
 
 enum EventType { red, black }
@@ -26,17 +27,11 @@ class WorkManagerState {
     this.logEvents = const [],
   });
 
-  factory WorkManagerState.copyOf(WorkManagerState state) {
-    return WorkManagerState(
-      redCount: state.redCount,
-      blackCount: state.blackCount,
-      logEvents: state.logEvents,
-    );
-  }
-
-  WorkManagerState copyWith({int? redCount,
+  WorkManagerState copyWith({
+    int? redCount,
     int? blackCount,
-    List<LogEvent>? logEvents}) {
+    List<LogEvent>? logEvents,
+  }) {
     return WorkManagerState(
       redCount: redCount ?? this.redCount,
       blackCount: blackCount ?? this.blackCount,
@@ -51,18 +46,17 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
 
   WorkManagerCubit(this._numberUsecase)
       : super(WorkManagerState(blackCount: 0, redCount: 0, logEvents: [
-    LogEvent(DateTime.now(), 0, EventType.red, true),
-    LogEvent(DateTime.now(), 1, EventType.black, false),
-    LogEvent(DateTime.now(), 2, EventType.red, true),
-    LogEvent(DateTime.now(), 3, EventType.black, false),
-    LogEvent(DateTime.now(), 2, EventType.red, true),
-    LogEvent(DateTime.now(), 0, EventType.red, true),
-    LogEvent(DateTime.now(), 1, EventType.black, false),
-    LogEvent(DateTime.now(), 2, EventType.red, true),
-    LogEvent(DateTime.now(), 3, EventType.black, false),
-    LogEvent(DateTime.now(), 2, EventType.red, true),
-  ]));
-
+          LogEvent(DateTime.now(), 0, EventType.red, true),
+          LogEvent(DateTime.now(), 1, EventType.black, false),
+          LogEvent(DateTime.now(), 2, EventType.red, true),
+          LogEvent(DateTime.now(), 3, EventType.black, false),
+          LogEvent(DateTime.now(), 2, EventType.red, true),
+          LogEvent(DateTime.now(), 0, EventType.red, true),
+          LogEvent(DateTime.now(), 1, EventType.black, false),
+          LogEvent(DateTime.now(), 2, EventType.red, true),
+          LogEvent(DateTime.now(), 3, EventType.black, false),
+          LogEvent(DateTime.now(), 2, EventType.red, true),
+        ]));
 
   Future<void> init() async {
     final redStream = await _numberUsecase.watchChange('red');
@@ -81,5 +75,35 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
     _numberUsecase.plusOneNumber(color);
   }
 
-  void addLog(String taskName) {}
+  Future<void> plusOneNumberMock(EventType color) async {
+    emit(state.copyWith(
+      logEvents: [
+        ...state.logEvents,
+        LogEvent(DateTime.now(), 0, color, false),
+      ],
+    ));
+
+    Future.microtask(() async {
+      bool isRetry = true;
+      while (isRetry) {
+        await Future.delayed(Duration(milliseconds: Random().nextInt(3000)));
+        if (Random().nextInt(100) < 2) {
+          isRetry = false;
+        }
+      }
+
+      switch (color) {
+        case EventType.red:
+          emit(state.copyWith(
+            redCount: state.redCount + 1,
+          ));
+          break;
+        case EventType.black:
+          emit(state.copyWith(
+            blackCount: state.blackCount + 1,
+          ));
+          break;
+      }
+    });
+  }
 }
