@@ -1,14 +1,13 @@
 import 'dart:ui';
 
 import 'package:workmanager/workmanager.dart';
-import '../local/log_local_datasource.dart';
+import '../local_isar/log_local_datasource.dart';
+import '../local_isar/number_local_datasource.dart';
 import '../remote/number_remote_datasource.dart';
 import '../../di/di.dart';
 
-import '../local/number_local_datasource.dart';
-
-const plusOneToRedTaskKey = 'plus_one_red';
-const plusOneToBlackTaskKey = 'plus_one_black2';
+const plusOneToRedTaskKey = 'plus_one_red3';
+const plusOneToBlackTaskKey = 'plus_one_black3';
 
 @pragma('vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
 void callbackDispatcher() {
@@ -16,8 +15,6 @@ void callbackDispatcher() {
     print('[Workmanager] $task, $inputData');
 
     getItInit();
-    // await getIt<NumberLocalDatasource>().initDb();
-    // await getIt<LogLocalDatasource>().initDb();
 
     switch (task) {
 

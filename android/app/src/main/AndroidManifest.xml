@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="workmanager_clean_architectue_sample"
+        android:label="workmanager_clean_architecture_sample"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

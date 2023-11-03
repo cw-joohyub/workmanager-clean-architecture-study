@@ -1,4 +1,4 @@
-# workmanager_clean_architectue_sample
+# workmanager_clean_architecture_sample
 
 A new Flutter project.
 

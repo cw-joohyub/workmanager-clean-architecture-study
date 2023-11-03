@@ -1,5 +1,5 @@
 // import 'package:injectable/injectable.dart';
-// import 'package:workmanager_clean_architectue_sample/data/repository/number_repository.dart';
+// import 'package:workmanager_clean_architecture_sample/data/repository/number_repository.dart';
 //
 // // import '../data/repository/sync_repository.dart';
 //

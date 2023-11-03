@@ -1,12 +1,16 @@
 import 'package:injectable/injectable.dart';
 
-// import 'package:workmanager_clean_architectue_sample/data/repository/sync_repository.dart';
-import 'package:workmanager_clean_architectue_sample/presentation/cubit/work_manager_cubit.dart';
+// import 'package:workmanager_clean_architecture_sample/data/repository/sync_repository.dart';
+import 'package:workmanager_clean_architecture_sample/presentation/cubit/work_manager_cubit.dart';
 
 import '../data/repository/number_repository.dart';
 
 abstract class NumberUsecase {
+
+  Future<Stream<int>?> watchChange(String color);
+
   void plusOneNumber(String color);
+
 
   // Future<int> getCount();
 
@@ -18,6 +22,9 @@ class NumberUsecaseImpl extends NumberUsecase {
   NumberUsecaseImpl(this._numberRepository);
 
   final NumberRepository _numberRepository;
+
+  @override
+  Future<Stream<int>?> watchChange(String color) => _numberRepository.watchChange(color);
 
   @override
   void plusOneNumber(String color) {

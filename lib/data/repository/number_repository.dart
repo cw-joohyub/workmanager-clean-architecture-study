@@ -1,11 +1,8 @@
-import 'package:flutter/foundation.dart';
-import 'package:hive/hive.dart';
 import 'package:injectable/injectable.dart';
 import 'package:workmanager/workmanager.dart';
 
-import '../local/log_local_datasource.dart';
-import '../local/number_data.dart';
-import '../local/number_local_datasource.dart';
+import '../local_isar/log_local_datasource.dart';
+import '../local_isar/number_local_datasource.dart';
 import '../work_manager/work_manager.dart';
 
 // abstract class SyncRepository {
@@ -20,31 +17,28 @@ class NumberRepository {
   final NumberLocalDatasource _numberLocalDatasource;
   final LogLocalDatasource _logLocalDatasource;
 
-  Future<void> init() async {
-    await _numberLocalDatasource.initDb();
-    await _logLocalDatasource.initDb();
-  }
-
   Future<int> getNumber(String color) async {
     return _numberLocalDatasource.getNumber(color);
   }
+
+  Future<Stream<int>?> watchChange(String color) => _numberLocalDatasource.watchChange(color);
 
   Future<void> postPlusOne(String color) async {
     final String taskKey = color == 'red' ? plusOneToRedTaskKey : plusOneToBlackTaskKey;
     final int logKey = await _logLocalDatasource.addLog(color);
 
-    print('postPlusOne : $color / $logKey / $taskKey');
+    print('postPlusOne : $color, $logKey');
 
     Workmanager().registerOneOffTask(
-      taskKey, taskKey,
+      '$taskKey$logKey', taskKey,
       inputData: <String, dynamic>{
         'logKey': logKey,
       },
       // constraints: Constraints(networkType: NetworkType.connected),
       backoffPolicy: BackoffPolicy.linear,
-      backoffPolicyDelay: const Duration(milliseconds: 100),
+      backoffPolicyDelay: const Duration(milliseconds: 500),
       initialDelay: const Duration(milliseconds: 100),
-      existingWorkPolicy: ExistingWorkPolicy.append,
+      existingWorkPolicy: ExistingWorkPolicy.replace,
     );
   }
 }

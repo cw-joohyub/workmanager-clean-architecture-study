@@ -3,11 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:getwidget/components/button/gf_button.dart';
 import 'package:getwidget/size/gf_size.dart';
 import 'package:glass_kit/glass_kit.dart';
-import 'package:workmanager_clean_architectue_sample/di/di.dart';
-import 'package:workmanager_clean_architectue_sample/presentation/cubit/work_manager_cubit.dart';
-import 'package:workmanager_clean_architectue_sample/presentation/widget/log_list_tile.dart';
-import 'package:workmanager_clean_architectue_sample/usecase/number_usecase.dart';
+import 'package:workmanager/workmanager.dart';
+import 'package:workmanager_clean_architecture_sample/di/di.dart';
+import 'package:workmanager_clean_architecture_sample/presentation/cubit/work_manager_cubit.dart';
+import 'package:workmanager_clean_architecture_sample/presentation/widget/log_list_tile.dart';
+import 'package:workmanager_clean_architecture_sample/usecase/number_usecase.dart';
 
+import '../data/work_manager/work_manager.dart';
 import '../util/gaps.dart';
 
 const redTaskKey = 'red_task';
@@ -19,12 +21,10 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-        create: (BuildContext context) => WorkManagerCubit(
-              getIt<NumberUsecase>(),
-            ),
+        create: (BuildContext context) => getIt<WorkManagerCubit>()..init(),
         child: BlocBuilder<WorkManagerCubit, WorkManagerState>(
           builder: (BuildContext context, WorkManagerState state) {
-            WorkManagerCubit cubit = context.read<WorkManagerCubit>();
+            // WorkManagerCubit cubit = context.read<WorkManagerCubit>();
 
             return Scaffold(
               appBar: AppBar(
@@ -37,7 +37,7 @@ class MainScreen extends StatelessWidget {
                   Gaps.vGap10,
                   _buildCountView(context, state),
                   const SizedBox(height: 20),
-                  _buildButtonView(cubit),
+                  _buildButtonView(context),
                   const SizedBox(height: 20),
                   _buildLogListView(state),
                 ],
@@ -111,23 +111,26 @@ class MainScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildButtonView(WorkManagerCubit cubit) {
+  Widget _buildButtonView(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
+
         GFButton(
           onPressed: () {
-            WorkManagerCubit(getIt<NumberUsecase>()).plusOneNumber('red');
-            // Workmanager().registerOneOffTask(
-            //   redTaskKey,
-            //   redTaskKey,
-            //   constraints: Constraints(networkType: NetworkType.connected),
-            //   backoffPolicy: BackoffPolicy.exponential,
-            //   backoffPolicyDelay: const Duration(milliseconds: 100),
-            //   inputData: <String, dynamic>{
-            //     'taskName': 'red',
-            //   },
-            // );
+            Workmanager().initialize(
+                callbackDispatcher, // The top level function, aka callbackDispatcher
+                isInDebugMode:
+                true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+            );          },
+          color: Colors.amber,
+          size: GFSize.MEDIUM,
+          text: 'WM Reset',
+        ),
+
+        GFButton(
+          onPressed: () {
+            context.read<WorkManagerCubit>().plusOneNumber('red');
           },
           color: Colors.red,
           size: GFSize.LARGE,
@@ -135,17 +138,7 @@ class MainScreen extends StatelessWidget {
         ),
         GFButton(
           onPressed: () {
-            WorkManagerCubit(getIt<NumberUsecase>()).plusOneNumber('black');
-            // Workmanager().registerOneOffTask(
-            //   blackTaskKey,
-            //   blackTaskKey,
-            //   constraints: Constraints(networkType: NetworkType.connected),
-            //   backoffPolicy: BackoffPolicy.exponential,
-            //   backoffPolicyDelay: const Duration(milliseconds: 100),
-            //   inputData: <String, dynamic>{
-            //     'taskName': 'black',
-            //   },
-            // );
+            context.read<WorkManagerCubit>().plusOneNumber('black');
           },
           color: Colors.black,
           size: GFSize.LARGE,
