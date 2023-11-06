@@ -80,28 +80,17 @@ class LogLocalDatasourceImpl extends LogLocalDatasource {
         return false;
       }
 
-      final DtLog newData;
-      if (remoteResult) {
-        newData = DtLog()
-          ..color = old.color
-          ..requestedAt = old.requestedAt
-          ..lastAttemptedAt = DateTime.now()
-          ..finishedAt = DateTime.now()
-          ..retryCount = old.retryCount
-          ..hasFinished = true;
-      } else {
-        newData = DtLog()
-          ..color = old.color
-          ..requestedAt = old.requestedAt
-          ..lastAttemptedAt = DateTime.now()
-          ..finishedAt = old.finishedAt
-          ..retryCount = (old.retryCount! + 1)
-          ..hasFinished = false;
-      }
+      old
+        ..lastAttemptedAt = DateTime.now()
+        ..finishedAt = DateTime.now()
+        ..retryCount = remoteResult ? old.retryCount : (old.retryCount! + 1)
+        ..hasFinished = remoteResult;
+
       isar?.writeTxnSync(() {
-        final id = isar?.dtLogs.putSync(newData);
+        final id = isar?.dtLogs.putSync(old);
         return id;
       });
+
       return Future<bool>.value(true);
     } catch (e) {
       print(e);
