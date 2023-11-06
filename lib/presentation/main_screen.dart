@@ -65,11 +65,12 @@ class MainScreen extends StatelessWidget {
     final WorkManagerCubit cubit = context.read<WorkManagerCubit>();
     return GFButton(
       onPressed: () {
-        cubit.plusOneNumberMock(const Uuid().v4(), type);
+        // cubit.plusOneNumberMock(const Uuid().v4(), type);
+        cubit.plusOneNumber(type.name);
       },
       onLongPress: () {
         for (int i = 0; i < 100; i++) {
-          cubit.plusOneNumberMock(const Uuid().v4(), type);
+          // cubit.plusOneNumberMock(const Uuid().v4(), type);
         }
       },
       color: type == EventType.red ? Colors.red : Colors.black,

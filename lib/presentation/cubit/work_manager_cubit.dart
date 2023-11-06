@@ -63,7 +63,9 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
     });
 
     logStream?.listen((event) async {
-      List<LogEvent> logEvents = await _numberUsecase.getAllLog();
+      Map<String, LogEvent> logEvents = {
+        for (var e in await _numberUsecase.getAllLog()) e.id: e
+      };
 
       emit(state.copyWith(logEvents: logEvents));
     });
@@ -78,7 +80,6 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
     emit(state.copyWith(
       logEvents: state.logEvents,
     ));
-
 
     Future.microtask(() async {
       bool isRetry = true;
