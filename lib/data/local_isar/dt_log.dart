@@ -17,4 +17,9 @@ class DtLog {
   int? retryCount;
 
   bool? hasFinished;
+
+  @override
+  String toString() {
+    return 'DtLog{id: $id, color: $color, requestedAt: $requestedAt, lastAttemptedAt: $lastAttemptedAt, finishedAt: $finishedAt, retryCount: $retryCount, hasFinished: $hasFinished}';
+  }
 }
