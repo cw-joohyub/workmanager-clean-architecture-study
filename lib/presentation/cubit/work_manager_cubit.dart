@@ -14,6 +14,11 @@ class LogEvent {
   bool isSuccess;
 
   LogEvent(this.time, this.retry, this.eventType, this.isSuccess);
+
+  @override
+  String toString() {
+    return 'LogEvent{time: $time, retry: $retry, eventType: $eventType, isSuccess: $isSuccess}';
+  }
 }
 
 class WorkManagerState {
@@ -61,6 +66,7 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
   Future<void> init() async {
     final redStream = await _numberUsecase.watchChange('red');
     final blackStream = await _numberUsecase.watchChange('black');
+    final logStream = await _numberUsecase.watchLogChanged();
 
     redStream?.listen((int number) {
       emit(state.copyWith(redCount: number));
@@ -69,10 +75,16 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
     blackStream?.listen((int number) {
       emit(state.copyWith(blackCount: number));
     });
+
+    logStream?.listen((event) async {
+      List<LogEvent> logEvents = await _numberUsecase.getAllLog();
+
+      emit(state.copyWith(logEvents: logEvents));
+    });
   }
 
-  void plusOneNumber(String color) {
-    _numberUsecase.plusOneNumber(color);
+  Future<void> plusOneNumber(String color) async {
+    await _numberUsecase.plusOneNumber(color);
   }
 
   Future<void> plusOneNumberMock(EventType color) async {
