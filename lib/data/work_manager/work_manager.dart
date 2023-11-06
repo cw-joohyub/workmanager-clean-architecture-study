@@ -17,7 +17,6 @@ void callbackDispatcher() {
     getItInit();
 
     switch (task) {
-
       case plusOneToRedTaskKey:
         final logKey = inputData!['logKey']!;
         final result = await getIt<NumberRemoteDatasource>().postAddEvent('red');

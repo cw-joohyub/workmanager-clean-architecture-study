@@ -11,6 +11,10 @@ abstract class LogLocalDatasource {
   Future<bool> updateLog(int key, bool remoteResult);
 
   Future<bool> deleteAll();
+
+  Future<Stream<void>?> watchLogChanged();
+
+  Future<List<DtLog>?> getAllLog();
 }
 
 @Injectable(as: LogLocalDatasource)
@@ -39,7 +43,6 @@ class LogLocalDatasourceImpl extends LogLocalDatasource {
     }
   }
 
-
   @override
   Future<int> addLog(String color) async {
     if (isar == null) {
@@ -55,12 +58,12 @@ class LogLocalDatasourceImpl extends LogLocalDatasource {
         ..hasFinished = false;
 
       return await isar?.writeTxnSync(() {
-        final id = isar?.dtLogs.putSync(logData);
-        return id;
-      }) ?? 0;
-
+            final id = isar?.dtLogs.putSync(logData);
+            return id;
+          }) ??
+          0;
     } catch (e) {
-      print (e);
+      print(e);
       throw Exception();
     }
   }
@@ -96,12 +99,12 @@ class LogLocalDatasourceImpl extends LogLocalDatasource {
           ..hasFinished = false;
       }
       isar?.writeTxnSync(() {
-        final id =  isar?.dtLogs.putSync(newData);
+        final id = isar?.dtLogs.putSync(newData);
         return id;
       });
       return Future<bool>.value(true);
     } catch (e) {
-      print (e);
+      print(e);
       throw Exception();
     }
   }
@@ -115,5 +118,23 @@ class LogLocalDatasourceImpl extends LogLocalDatasource {
     isar?.dtLogs.clearSync();
 
     return Future<bool>.value(true);
+  }
+
+  @override
+  Future<Stream<void>?> watchLogChanged() async {
+    if (isar == null) {
+      await initDb();
+    }
+
+    return isar?.dtLogs.watchLazy();
+  }
+
+  @override
+  Future<List<DtLog>?> getAllLog() async {
+    if (isar == null) {
+      await initDb();
+    }
+
+    return isar?.dtLogs.where().findAll();
   }
 }

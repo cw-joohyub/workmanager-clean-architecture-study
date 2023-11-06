@@ -6,15 +6,15 @@ import 'package:workmanager_clean_architecture_sample/presentation/cubit/work_ma
 import '../data/repository/number_repository.dart';
 
 abstract class NumberUsecase {
-
   Future<Stream<int>?> watchChange(String color);
 
-  void plusOneNumber(String color);
+  Future<Stream<void>?> watchLogChanged();
 
-
-  // Future<int> getCount();
+  Future<void> plusOneNumber(String color);
 
   LogEvent addLog(String taskName, int retryCount);
+
+  Future<List<LogEvent>> getAllLog();
 }
 
 @Injectable(as: NumberUsecase)
@@ -27,9 +27,12 @@ class NumberUsecaseImpl extends NumberUsecase {
   Future<Stream<int>?> watchChange(String color) => _numberRepository.watchChange(color);
 
   @override
-  void plusOneNumber(String color) {
-    _numberRepository.postPlusOne(color);
+  Future<void> plusOneNumber(String color) async {
+    await _numberRepository.postPlusOne(color);
   }
+
+  @override
+  Future<Stream<void>?> watchLogChanged() => _numberRepository.watchLogChanged();
 
   @override
   LogEvent addLog(String taskName, int retryCount) {
@@ -38,6 +41,11 @@ class NumberUsecaseImpl extends NumberUsecase {
     // _numberRepository.addLog(taskName, timeStamp, retryCount);
 
     return LogEvent(taskName, [timeStamp], retryCount + 1, EventType.red, true);
+  }
+
+  @override
+  Future<List<LogEvent>> getAllLog() async {
+    return await _numberRepository.getAllLog();
   }
 
 // @override
