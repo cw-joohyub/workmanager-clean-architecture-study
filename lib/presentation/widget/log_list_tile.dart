@@ -7,7 +7,7 @@ import 'package:styled_widget/styled_widget.dart';
 import '../cubit/work_manager_cubit.dart';
 
 class LogListTile extends StatelessWidget {
-  final DateTime datetime;
+  final List<DateTime> datetime;
   final int retry;
   final EventType eventType;
   final bool isSuccess;
@@ -22,13 +22,14 @@ class LogListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String formattedDate =
-        '${datetime.year}-${datetime.month.toString().padLeft(2, '0')}'
-        '-${datetime.day.toString().padLeft(2, '0')} '
-        '${datetime.hour.toString().padLeft(2, '0')}:'
-        '${datetime.minute.toString().padLeft(2, '0')}:'
-        '${datetime.second.toString().padLeft(2, '0')}.'
-        '${datetime.millisecond.toString().padLeft(3, '0')}';
+    final DateTime lastDatetime = datetime.last;
+    final String lastFormattedDate =
+        '${lastDatetime.year}-${lastDatetime.month.toString().padLeft(2, '0')}'
+        '-${lastDatetime.day.toString().padLeft(2, '0')} '
+        '${lastDatetime.hour.toString().padLeft(2, '0')}:'
+        '${lastDatetime.minute.toString().padLeft(2, '0')}:'
+        '${lastDatetime.second.toString().padLeft(2, '0')}.'
+        '${lastDatetime.millisecond.toString().padLeft(3, '0')}';
 
     return GFListTile(
       avatar: GFAvatar(
@@ -37,7 +38,7 @@ class LogListTile extends StatelessWidget {
         child: Text(eventType == EventType.red ? 'R' : 'B',
             style: const TextStyle(color: Colors.white)),
       ),
-      title: Text('$formattedDate / retry : $retry').bold(),
+      title: Text('$lastFormattedDate / retry : $retry').bold(),
       icon: isSuccess ? const Icon(
         Icons.check_circle,
         color: Colors.greenAccent) : null,

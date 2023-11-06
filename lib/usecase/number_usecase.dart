@@ -37,7 +37,7 @@ class NumberUsecaseImpl extends NumberUsecase {
     print('RedUsecaseImpl/addLog - $taskName, $timeStamp $retryCount');
     // _numberRepository.addLog(taskName, timeStamp, retryCount);
 
-    return LogEvent(timeStamp, retryCount + 1, EventType.red, true);
+    return LogEvent(taskName, [timeStamp], retryCount + 1, EventType.red, true);
   }
 
 // @override

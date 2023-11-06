@@ -69,6 +69,8 @@ dependencies:
   # Plot
   fl_chart: ^0.64.0
 
+  uuid: ^4.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

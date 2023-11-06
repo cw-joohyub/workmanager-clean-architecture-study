@@ -68,6 +68,7 @@ class _CounterPanelState extends State<CounterPanel> {
     widget.eventType == EventType.red ? state.redCount : state.blackCount;
 
     final int totalCount = state.logEvents
+        .values
         .where((element) => element.eventType == widget.eventType)
         .length;
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:bloc/bloc.dart';
@@ -8,29 +9,30 @@ import '../../usecase/number_usecase.dart';
 enum EventType { red, black }
 
 class LogEvent {
-  final DateTime time;
-  final int retry;
+  String id;
+  final List<DateTime> tryTimes;
+  int retry;
   EventType eventType;
   bool isSuccess;
 
-  LogEvent(this.time, this.retry, this.eventType, this.isSuccess);
+  LogEvent(this.id, this.tryTimes, this.retry, this.eventType, this.isSuccess);
 }
 
 class WorkManagerState {
   final int redCount;
   final int blackCount;
-  final List<LogEvent> logEvents;
+  final Map<String, LogEvent> logEvents;
 
   WorkManagerState({
     this.redCount = 0,
     this.blackCount = 0,
-    this.logEvents = const [],
+    this.logEvents = const {},
   });
 
   WorkManagerState copyWith({
     int? redCount,
     int? blackCount,
-    List<LogEvent>? logEvents,
+    Map<String, LogEvent>? logEvents,
   }) {
     return WorkManagerState(
       redCount: redCount ?? this.redCount,
@@ -45,18 +47,7 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
   final NumberUsecase _numberUsecase;
 
   WorkManagerCubit(this._numberUsecase)
-      : super(WorkManagerState(blackCount: 0, redCount: 0, logEvents: [
-          LogEvent(DateTime.now(), 0, EventType.red, true),
-          LogEvent(DateTime.now(), 1, EventType.black, false),
-          LogEvent(DateTime.now(), 2, EventType.red, true),
-          LogEvent(DateTime.now(), 3, EventType.black, false),
-          LogEvent(DateTime.now(), 2, EventType.red, true),
-          LogEvent(DateTime.now(), 0, EventType.red, true),
-          LogEvent(DateTime.now(), 1, EventType.black, false),
-          LogEvent(DateTime.now(), 2, EventType.red, true),
-          LogEvent(DateTime.now(), 3, EventType.black, false),
-          LogEvent(DateTime.now(), 2, EventType.red, true),
-        ]));
+      : super(WorkManagerState(blackCount: 0, redCount: 0, logEvents: {}));
 
   Future<void> init() async {
     final redStream = await _numberUsecase.watchChange('red');
@@ -75,20 +66,23 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
     _numberUsecase.plusOneNumber(color);
   }
 
-  Future<void> plusOneNumberMock(EventType color) async {
+  Future<void> plusOneNumberMock(String key, EventType color) async {
+    state.logEvents[key] = LogEvent(key, [DateTime.now()], 0, color, false);
     emit(state.copyWith(
-      logEvents: [
-        ...state.logEvents,
-        LogEvent(DateTime.now(), 0, color, false),
-      ],
+      logEvents: state.logEvents,
     ));
+
 
     Future.microtask(() async {
       bool isRetry = true;
       while (isRetry) {
-        await Future.delayed(Duration(milliseconds: Random().nextInt(3000)));
-        if (Random().nextInt(100) < 2) {
+        await Future.delayed(Duration(milliseconds: Random().nextInt(30)));
+        if (Random().nextInt(1000) < 2) {
           isRetry = false;
+          state.logEvents[key]?.isSuccess = true;
+        } else {
+          state.logEvents[key]?.retry++;
+          emit(state.copyWith(logEvents: state.logEvents));
         }
       }
 
