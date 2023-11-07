@@ -63,9 +63,7 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
     });
 
     logStream?.listen((event) async {
-      Map<String, LogEvent> logEvents = {
-        for (var e in await _numberUsecase.getAllLog()) e.id: e
-      };
+      Map<String, LogEvent> logEvents = {for (var e in await _numberUsecase.getAllLog()) e.id: e};
 
       emit(state.copyWith(logEvents: logEvents));
     });

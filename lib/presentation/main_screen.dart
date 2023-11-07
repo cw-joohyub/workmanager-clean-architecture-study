@@ -33,10 +33,8 @@ class MainScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     Gaps.vGap10,
-                    [
-                      const CounterPanel(EventType.red),
-                      const CounterPanel(EventType.black)
-                    ].toRow(mainAxisAlignment: MainAxisAlignment.spaceAround),
+                    [const CounterPanel(EventType.red), const CounterPanel(EventType.black)]
+                        .toRow(mainAxisAlignment: MainAxisAlignment.spaceAround),
                     const SizedBox(height: 20),
                     [
                       _buildWorkStartButton(context, EventType.red),
@@ -65,12 +63,11 @@ class MainScreen extends StatelessWidget {
     final WorkManagerCubit cubit = context.read<WorkManagerCubit>();
     return GFButton(
       onPressed: () {
-        // cubit.plusOneNumberMock(const Uuid().v4(), type);
         cubit.plusOneNumber(type.name);
       },
-      onLongPress: () {
+      onLongPress: () async {
         for (int i = 0; i < 100; i++) {
-          // cubit.plusOneNumberMock(const Uuid().v4(), type);
+          cubit.plusOneNumber(type.name);
         }
       },
       color: type == EventType.red ? Colors.red : Colors.black,
@@ -78,6 +75,4 @@ class MainScreen extends StatelessWidget {
       text: '+1 to ${type.name} (after 1s)',
     );
   }
-
-
 }

@@ -48,8 +48,21 @@ class NumberRepository {
 
     print('postPlusOne : $color, $logKey');
 
+    //Work Unique keys
+    // Workmanager().registerOneOffTask('$taskKey$logKey', taskKey,
+    //     inputData: <String, dynamic>{
+    //       'logKey': logKey,
+    //     },
+    //     // constraints: Constraints(networkType: NetworkType.connected),
+    //     backoffPolicy: BackoffPolicy.linear,
+    //     backoffPolicyDelay: const Duration(milliseconds: 500),
+    //     initialDelay: const Duration(milliseconds: 100),
+    //     existingWorkPolicy: ExistingWorkPolicy.append,
+    //     outOfQuotaPolicy: OutOfQuotaPolicy.run_as_non_expedited_work_request,);
+
+    // Work Unique keys
     Workmanager().registerOneOffTask(
-      '$taskKey$logKey', taskKey,
+      color, taskKey,
       inputData: <String, dynamic>{
         'logKey': logKey,
       },
@@ -57,7 +70,8 @@ class NumberRepository {
       backoffPolicy: BackoffPolicy.linear,
       backoffPolicyDelay: const Duration(milliseconds: 500),
       initialDelay: const Duration(milliseconds: 100),
-      existingWorkPolicy: ExistingWorkPolicy.replace,
+      existingWorkPolicy: ExistingWorkPolicy.append,
+      outOfQuotaPolicy: OutOfQuotaPolicy.run_as_non_expedited_work_request,
     );
   }
 }
