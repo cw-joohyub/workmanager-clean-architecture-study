@@ -21,6 +21,7 @@ void callbackDispatcher() {
     switch (task) {
       case plusOneToRedTaskKey:
         final logKey = inputData!['logKey']!;
+        print('logKey - $logKey');
         final result =
             await getIt<NumberRemoteDatasource>().postAddEvent('red');
         await getIt<LogLocalDatasource>().updateLog(logKey, result);

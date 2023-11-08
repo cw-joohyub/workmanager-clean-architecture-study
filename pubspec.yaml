@@ -71,6 +71,12 @@ dependencies:
 
   uuid: ^4.1.0
 
+#dependency_overrides:
+#  workmanager:
+#    git:
+#      url: https://github.com/cw-JihunCha/flutter_workmanager.git
+#      ref: main
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
