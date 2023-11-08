@@ -54,12 +54,14 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
     final blackStream = await _numberUsecase.watchChange('black');
     final logStream = await _numberUsecase.watchLogChanged();
 
-    redStream?.listen((int number) {
-      emit(state.copyWith(redCount: number));
+    redStream?.listen((event) async {
+      int resultNumber = await _numberUsecase.getLastNumber('red');
+      emit(state.copyWith(redCount: resultNumber));
     });
 
-    blackStream?.listen((int number) {
-      emit(state.copyWith(blackCount: number));
+    blackStream?.listen((event) async {
+      int resultNumber = await _numberUsecase.getLastNumber('black');
+      emit(state.copyWith(blackCount: resultNumber));
     });
 
     logStream?.listen((event) async {

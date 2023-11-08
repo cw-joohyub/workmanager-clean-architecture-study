@@ -6,7 +6,7 @@ import 'dt_number.dart';
 abstract class NumberLocalDatasource {
   Future<void> initDb();
 
-  Future<Stream<int>?> watchChange(String color);
+  Future<Stream<void>?> watchChange(String color);
 
   Future<bool> setNumber(String color, int number);
 
@@ -59,7 +59,7 @@ class NumberLocalDatasourceImpl extends NumberLocalDatasource {
 
       return false;
     } catch (e) {
-      print (e);
+      print(e);
       throw Exception();
     }
   }
@@ -70,20 +70,29 @@ class NumberLocalDatasourceImpl extends NumberLocalDatasource {
       await initDb();
     }
     try {
-      final DtNumber? numberData = isar?.dtNumbers.getSync(_getId(color)); // get
+      // final DtNumber? numberData = isar?.dtNumbers.getSync(_getId(color)); // get
 
-      return numberData?.value ?? 0;
+      final List<DtNumber>? resultList = await isar?.dtNumbers.where().findAll();
+
+      print('getNumber ${resultList?.last.toString()}');
+      return resultList?.last.value ?? 0;
     } catch (e) {
-      print (e);
+      print('getNumber/exception $e');
       throw Exception();
     }
   }
 
-  Future<Stream<int>?> watchChange(String color) async {
+  @override
+  Future<Stream<void>?> watchChange(String color) async {
     if (isar == null) {
       await initDb();
     }
-    return isar?.dtNumbers.watchObject(_getId(color)).map<int>((DtNumber? number) => number?.value ?? 0);
+
+    return isar?.dtNumbers.watchLazy();
+    // return isar?.dtNumbers.watchLazy(_getId(color)).map<int>((DtNumber? number) {
+    //   print('watchChange/result - $color / ${number?.id} / ${number?.value}');
+    //   return number?.value ?? 0;
+    // });
   }
 
   @override
@@ -92,26 +101,29 @@ class NumberLocalDatasourceImpl extends NumberLocalDatasource {
       await initDb();
     }
     try {
-      final DtNumber? old = await isar?.dtNumbers.getSync(_getId(color)); // get
-      final DtNumber newNumberData;
-      if (old == null) {
-        newNumberData = DtNumber()
-            ..id = _getId(color)
-            ..value = 1;
-      } else {
-        newNumberData = DtNumber()
-          ..id = old.id
-          ..value = (old.value! + 1);
-      }
+      // final DtNumber? old = await isar?.dtNumbers.getSync(_getId(color)); // get
+      // final List<DtNumber>? resultList = isar?.dtNumbers.where().findAllSync();
 
-      await isar?.writeTxnSync(() async {
+      isar?.writeTxnSync(() {
+        final DtNumber newNumberData;
+        final bool? isEmpty = isar?.dtNumbers.where().isEmptySync();
+
+        if (isEmpty != null && isEmpty) {
+          newNumberData = DtNumber()
+            ..id = 0
+            ..value = 1;
+        } else {
+          final List<DtNumber>? resultList = isar?.dtNumbers.where().findAllSync();
+          newNumberData = DtNumber()..value = (resultList!.last.value! + 1);
+        }
+
         isar?.dtNumbers.putSync(newNumberData);
         return true;
       });
 
       return Future<bool>.value(true);
     } catch (exception) {
-      print(exception.toString());
+      print('test - ${exception.toString()}');
       throw Exception();
     }
   }

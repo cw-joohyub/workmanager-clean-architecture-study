@@ -66,7 +66,7 @@ class MainScreen extends StatelessWidget {
         cubit.plusOneNumber(type.name);
       },
       onLongPress: () async {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 50; i++) {
           cubit.plusOneNumber(type.name);
         }
       },

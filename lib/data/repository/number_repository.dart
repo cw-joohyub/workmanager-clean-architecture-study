@@ -10,11 +10,6 @@ import '../local_isar/log_local_datasource.dart';
 import '../local_isar/number_local_datasource.dart';
 import '../work_manager/work_manager.dart';
 
-// abstract class SyncRepository {
-//
-// }
-//
-// @Injectable(as: SyncRepository)
 @injectable
 class NumberRepository {
   NumberRepository(this._numberLocalDatasource, this._logLocalDatasource);
@@ -26,7 +21,11 @@ class NumberRepository {
     return _numberLocalDatasource.getNumber(color);
   }
 
-  Future<Stream<int>?> watchChange(String color) => _numberLocalDatasource.watchChange(color);
+  Future<Stream<void>?> watchChange(String color) {
+    print('watchChange - $color');
+
+    return _numberLocalDatasource.watchChange(color);
+  }
 
   Future<Stream<void>?> watchLogChanged() => _logLocalDatasource.watchLogChanged();
 
@@ -40,6 +39,10 @@ class NumberRepository {
     List<LogEvent> result = dtLogList.map((e) => LogEventMapper().mapToLogEvent(e)).toList();
 
     return result;
+  }
+
+  Future<int> getLastNumber(String color) async {
+    return await _numberLocalDatasource.getNumber(color);
   }
 
   Future<void> postPlusOne(String color) async {
@@ -61,17 +64,21 @@ class NumberRepository {
     //     outOfQuotaPolicy: OutOfQuotaPolicy.run_as_non_expedited_work_request,);
 
     // Work Unique keys
-    Workmanager().registerOneOffTask(
-      color, taskKey,
-      inputData: <String, dynamic>{
-        'logKey': logKey,
-      },
-      // constraints: Constraints(networkType: NetworkType.connected),
-      backoffPolicy: BackoffPolicy.linear,
-      backoffPolicyDelay: const Duration(milliseconds: 500),
-      initialDelay: const Duration(milliseconds: 100),
-      existingWorkPolicy: ExistingWorkPolicy.append,
-      outOfQuotaPolicy: OutOfQuotaPolicy.run_as_non_expedited_work_request,
-    );
+
+    for (int i = 0; i < 3; i++) {
+      Workmanager().registerOneOffTask(
+        '$color-$i',
+        taskKey,
+        inputData: <String, dynamic>{
+          'logKey': logKey,
+        },
+        // constraints: Constraints(networkType: NetworkType.connected),
+        backoffPolicy: BackoffPolicy.linear,
+        backoffPolicyDelay: const Duration(milliseconds: 500),
+        initialDelay: const Duration(milliseconds: 100),
+        existingWorkPolicy: ExistingWorkPolicy.append,
+        // outOfQuotaPolicy: OutOfQuotaPolicy.run_as_non_expedited_work_request,
+      );
+    }
   }
 }

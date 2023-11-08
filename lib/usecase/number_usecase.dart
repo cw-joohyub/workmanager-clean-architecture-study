@@ -1,12 +1,11 @@
 import 'package:injectable/injectable.dart';
 
-// import 'package:workmanager_clean_architecture_sample/data/repository/sync_repository.dart';
 import 'package:workmanager_clean_architecture_sample/presentation/cubit/work_manager_cubit.dart';
 
 import '../data/repository/number_repository.dart';
 
 abstract class NumberUsecase {
-  Future<Stream<int>?> watchChange(String color);
+  Future<Stream<void>?> watchChange(String color);
 
   Future<Stream<void>?> watchLogChanged();
 
@@ -15,6 +14,8 @@ abstract class NumberUsecase {
   LogEvent addLog(String taskName, int retryCount);
 
   Future<List<LogEvent>> getAllLog();
+
+  Future<int> getLastNumber(String color);
 }
 
 @Injectable(as: NumberUsecase)
@@ -24,7 +25,7 @@ class NumberUsecaseImpl extends NumberUsecase {
   final NumberRepository _numberRepository;
 
   @override
-  Future<Stream<int>?> watchChange(String color) => _numberRepository.watchChange(color);
+  Future<Stream<void>?> watchChange(String color) => _numberRepository.watchChange(color);
 
   @override
   Future<void> plusOneNumber(String color) async {
@@ -37,7 +38,7 @@ class NumberUsecaseImpl extends NumberUsecase {
   @override
   LogEvent addLog(String taskName, int retryCount) {
     DateTime timeStamp = DateTime.now();
-    print('RedUsecaseImpl/addLog - $taskName, $timeStamp $retryCount');
+    print('NumberUsecaseImpl/addLog - $taskName, $timeStamp $retryCount');
     // _numberRepository.addLog(taskName, timeStamp, retryCount);
 
     return LogEvent(taskName, [timeStamp], retryCount + 1, EventType.red, true);
@@ -48,8 +49,8 @@ class NumberUsecaseImpl extends NumberUsecase {
     return await _numberRepository.getAllLog();
   }
 
-// @override
-// Future<int> getCount() {
-// return _numberRepository.getRedCount();
-// }
+  @override
+  Future<int> getLastNumber(String color) async {
+    return await _numberRepository.getLastNumber(color);
+  }
 }

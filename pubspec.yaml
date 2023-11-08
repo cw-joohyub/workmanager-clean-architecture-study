@@ -71,6 +71,8 @@ dependencies:
 
   uuid: ^4.1.0
 
+  dart_ping: ^9.0.1
+
 #dependency_overrides:
 #  workmanager:
 #    git:
