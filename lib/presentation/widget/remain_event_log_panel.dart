@@ -17,10 +17,7 @@ class RemainEventLogPanel extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 10),
       borderRadius: BorderRadius.circular(20),
       gradient: LinearGradient(
-        colors: [
-          Colors.deepPurple.withOpacity(0.60),
-          Colors.deepPurpleAccent.withOpacity(0.20)
-        ],
+        colors: [Colors.deepPurple.withOpacity(0.60), Colors.deepPurpleAccent.withOpacity(0.20)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
@@ -50,12 +47,10 @@ class RemainEventLogPanel extends StatelessWidget {
             width: 400,
             height: 280,
             child: ListView(
-              children: state.logEvents.values.where((LogEvent e) => !e.isSuccess).map((LogEvent e) {
+              children:
+                  state.logEvents.values.where((LogEvent e) => !e.isSuccess).map((LogEvent e) {
                 return LogListTile(
-                    datetime: e.tryTimes,
-                    retry: e.retry,
-                    eventType: e.eventType,
-                    isSuccess: e.isSuccess);
+                    datetime: e.dateTime, retry: 0, eventType: e.eventType, isSuccess: e.isSuccess);
               }).toList(),
             ),
           ),

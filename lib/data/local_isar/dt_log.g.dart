@@ -22,9 +22,9 @@ const DtLogSchema = CollectionSchema(
       name: r'color',
       type: IsarType.string,
     ),
-    r'finishedAt': PropertySchema(
+    r'dateTime': PropertySchema(
       id: 1,
-      name: r'finishedAt',
+      name: r'dateTime',
       type: IsarType.dateTime,
     ),
     r'hasFinished': PropertySchema(
@@ -32,20 +32,10 @@ const DtLogSchema = CollectionSchema(
       name: r'hasFinished',
       type: IsarType.bool,
     ),
-    r'lastAttemptedAt': PropertySchema(
+    r'logKey': PropertySchema(
       id: 3,
-      name: r'lastAttemptedAt',
-      type: IsarType.dateTime,
-    ),
-    r'requestedAt': PropertySchema(
-      id: 4,
-      name: r'requestedAt',
-      type: IsarType.dateTime,
-    ),
-    r'retryCount': PropertySchema(
-      id: 5,
-      name: r'retryCount',
-      type: IsarType.long,
+      name: r'logKey',
+      type: IsarType.string,
     )
   },
   estimateSize: _dtLogEstimateSize,
@@ -74,6 +64,12 @@ int _dtLogEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  {
+    final value = object.logKey;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -84,11 +80,9 @@ void _dtLogSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.color);
-  writer.writeDateTime(offsets[1], object.finishedAt);
+  writer.writeDateTime(offsets[1], object.dateTime);
   writer.writeBool(offsets[2], object.hasFinished);
-  writer.writeDateTime(offsets[3], object.lastAttemptedAt);
-  writer.writeDateTime(offsets[4], object.requestedAt);
-  writer.writeLong(offsets[5], object.retryCount);
+  writer.writeString(offsets[3], object.logKey);
 }
 
 DtLog _dtLogDeserialize(
@@ -99,12 +93,10 @@ DtLog _dtLogDeserialize(
 ) {
   final object = DtLog();
   object.color = reader.readStringOrNull(offsets[0]);
-  object.finishedAt = reader.readDateTimeOrNull(offsets[1]);
+  object.dateTime = reader.readDateTimeOrNull(offsets[1]);
   object.hasFinished = reader.readBoolOrNull(offsets[2]);
   object.id = id;
-  object.lastAttemptedAt = reader.readDateTimeOrNull(offsets[3]);
-  object.requestedAt = reader.readDateTimeOrNull(offsets[4]);
-  object.retryCount = reader.readLongOrNull(offsets[5]);
+  object.logKey = reader.readStringOrNull(offsets[3]);
   return object;
 }
 
@@ -122,11 +114,7 @@ P _dtLogDeserializeProp<P>(
     case 2:
       return (reader.readBoolOrNull(offset)) as P;
     case 3:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 4:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 5:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -364,59 +352,59 @@ extension DtLogQueryFilter on QueryBuilder<DtLog, DtLog, QFilterCondition> {
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> finishedAtIsNull() {
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> dateTimeIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'finishedAt',
+        property: r'dateTime',
       ));
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> finishedAtIsNotNull() {
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> dateTimeIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'finishedAt',
+        property: r'dateTime',
       ));
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> finishedAtEqualTo(
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> dateTimeEqualTo(
       DateTime? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'finishedAt',
+        property: r'dateTime',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> finishedAtGreaterThan(
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> dateTimeGreaterThan(
     DateTime? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'finishedAt',
+        property: r'dateTime',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> finishedAtLessThan(
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> dateTimeLessThan(
     DateTime? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'finishedAt',
+        property: r'dateTime',
         value: value,
       ));
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> finishedAtBetween(
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> dateTimeBetween(
     DateTime? lower,
     DateTime? upper, {
     bool includeLower = true,
@@ -424,7 +412,7 @@ extension DtLogQueryFilter on QueryBuilder<DtLog, DtLog, QFilterCondition> {
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'finishedAt',
+        property: r'dateTime',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -511,209 +499,147 @@ extension DtLogQueryFilter on QueryBuilder<DtLog, DtLog, QFilterCondition> {
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> lastAttemptedAtIsNull() {
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> logKeyIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'lastAttemptedAt',
+        property: r'logKey',
       ));
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> lastAttemptedAtIsNotNull() {
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> logKeyIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'lastAttemptedAt',
+        property: r'logKey',
       ));
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> lastAttemptedAtEqualTo(
-      DateTime? value) {
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> logKeyEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'lastAttemptedAt',
+        property: r'logKey',
         value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> lastAttemptedAtGreaterThan(
-    DateTime? value, {
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> logKeyGreaterThan(
+    String? value, {
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'lastAttemptedAt',
+        property: r'logKey',
         value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> lastAttemptedAtLessThan(
-    DateTime? value, {
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> logKeyLessThan(
+    String? value, {
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'lastAttemptedAt',
+        property: r'logKey',
         value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> lastAttemptedAtBetween(
-    DateTime? lower,
-    DateTime? upper, {
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> logKeyBetween(
+    String? lower,
+    String? upper, {
     bool includeLower = true,
     bool includeUpper = true,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'lastAttemptedAt',
+        property: r'logKey',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> requestedAtIsNull() {
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> logKeyStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'requestedAt',
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'logKey',
+        value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> requestedAtIsNotNull() {
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> logKeyEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'requestedAt',
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'logKey',
+        value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> requestedAtEqualTo(
-      DateTime? value) {
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> logKeyContains(String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'logKey',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> logKeyMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'logKey',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> logKeyIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'requestedAt',
-        value: value,
+        property: r'logKey',
+        value: '',
       ));
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> requestedAtGreaterThan(
-    DateTime? value, {
-    bool include = false,
-  }) {
+  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> logKeyIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'requestedAt',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> requestedAtLessThan(
-    DateTime? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'requestedAt',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> requestedAtBetween(
-    DateTime? lower,
-    DateTime? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'requestedAt',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> retryCountIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'retryCount',
-      ));
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> retryCountIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'retryCount',
-      ));
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> retryCountEqualTo(
-      int? value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'retryCount',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> retryCountGreaterThan(
-    int? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'retryCount',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> retryCountLessThan(
-    int? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'retryCount',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterFilterCondition> retryCountBetween(
-    int? lower,
-    int? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'retryCount',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
+        property: r'logKey',
+        value: '',
       ));
     });
   }
@@ -736,15 +662,15 @@ extension DtLogQuerySortBy on QueryBuilder<DtLog, DtLog, QSortBy> {
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> sortByFinishedAt() {
+  QueryBuilder<DtLog, DtLog, QAfterSortBy> sortByDateTime() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'finishedAt', Sort.asc);
+      return query.addSortBy(r'dateTime', Sort.asc);
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> sortByFinishedAtDesc() {
+  QueryBuilder<DtLog, DtLog, QAfterSortBy> sortByDateTimeDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'finishedAt', Sort.desc);
+      return query.addSortBy(r'dateTime', Sort.desc);
     });
   }
 
@@ -760,39 +686,15 @@ extension DtLogQuerySortBy on QueryBuilder<DtLog, DtLog, QSortBy> {
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> sortByLastAttemptedAt() {
+  QueryBuilder<DtLog, DtLog, QAfterSortBy> sortByLogKey() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lastAttemptedAt', Sort.asc);
+      return query.addSortBy(r'logKey', Sort.asc);
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> sortByLastAttemptedAtDesc() {
+  QueryBuilder<DtLog, DtLog, QAfterSortBy> sortByLogKeyDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lastAttemptedAt', Sort.desc);
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> sortByRequestedAt() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'requestedAt', Sort.asc);
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> sortByRequestedAtDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'requestedAt', Sort.desc);
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> sortByRetryCount() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'retryCount', Sort.asc);
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> sortByRetryCountDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'retryCount', Sort.desc);
+      return query.addSortBy(r'logKey', Sort.desc);
     });
   }
 }
@@ -810,15 +712,15 @@ extension DtLogQuerySortThenBy on QueryBuilder<DtLog, DtLog, QSortThenBy> {
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> thenByFinishedAt() {
+  QueryBuilder<DtLog, DtLog, QAfterSortBy> thenByDateTime() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'finishedAt', Sort.asc);
+      return query.addSortBy(r'dateTime', Sort.asc);
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> thenByFinishedAtDesc() {
+  QueryBuilder<DtLog, DtLog, QAfterSortBy> thenByDateTimeDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'finishedAt', Sort.desc);
+      return query.addSortBy(r'dateTime', Sort.desc);
     });
   }
 
@@ -846,39 +748,15 @@ extension DtLogQuerySortThenBy on QueryBuilder<DtLog, DtLog, QSortThenBy> {
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> thenByLastAttemptedAt() {
+  QueryBuilder<DtLog, DtLog, QAfterSortBy> thenByLogKey() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lastAttemptedAt', Sort.asc);
+      return query.addSortBy(r'logKey', Sort.asc);
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> thenByLastAttemptedAtDesc() {
+  QueryBuilder<DtLog, DtLog, QAfterSortBy> thenByLogKeyDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lastAttemptedAt', Sort.desc);
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> thenByRequestedAt() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'requestedAt', Sort.asc);
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> thenByRequestedAtDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'requestedAt', Sort.desc);
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> thenByRetryCount() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'retryCount', Sort.asc);
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QAfterSortBy> thenByRetryCountDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'retryCount', Sort.desc);
+      return query.addSortBy(r'logKey', Sort.desc);
     });
   }
 }
@@ -891,9 +769,9 @@ extension DtLogQueryWhereDistinct on QueryBuilder<DtLog, DtLog, QDistinct> {
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QDistinct> distinctByFinishedAt() {
+  QueryBuilder<DtLog, DtLog, QDistinct> distinctByDateTime() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'finishedAt');
+      return query.addDistinctBy(r'dateTime');
     });
   }
 
@@ -903,21 +781,10 @@ extension DtLogQueryWhereDistinct on QueryBuilder<DtLog, DtLog, QDistinct> {
     });
   }
 
-  QueryBuilder<DtLog, DtLog, QDistinct> distinctByLastAttemptedAt() {
+  QueryBuilder<DtLog, DtLog, QDistinct> distinctByLogKey(
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'lastAttemptedAt');
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QDistinct> distinctByRequestedAt() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'requestedAt');
-    });
-  }
-
-  QueryBuilder<DtLog, DtLog, QDistinct> distinctByRetryCount() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'retryCount');
+      return query.addDistinctBy(r'logKey', caseSensitive: caseSensitive);
     });
   }
 }
@@ -935,9 +802,9 @@ extension DtLogQueryProperty on QueryBuilder<DtLog, DtLog, QQueryProperty> {
     });
   }
 
-  QueryBuilder<DtLog, DateTime?, QQueryOperations> finishedAtProperty() {
+  QueryBuilder<DtLog, DateTime?, QQueryOperations> dateTimeProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'finishedAt');
+      return query.addPropertyName(r'dateTime');
     });
   }
 
@@ -947,21 +814,9 @@ extension DtLogQueryProperty on QueryBuilder<DtLog, DtLog, QQueryProperty> {
     });
   }
 
-  QueryBuilder<DtLog, DateTime?, QQueryOperations> lastAttemptedAtProperty() {
+  QueryBuilder<DtLog, String?, QQueryOperations> logKeyProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'lastAttemptedAt');
-    });
-  }
-
-  QueryBuilder<DtLog, DateTime?, QQueryOperations> requestedAtProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'requestedAt');
-    });
-  }
-
-  QueryBuilder<DtLog, int?, QQueryOperations> retryCountProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'retryCount');
+      return query.addPropertyName(r'logKey');
     });
   }
 }

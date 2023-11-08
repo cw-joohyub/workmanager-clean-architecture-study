@@ -6,20 +6,29 @@ part 'dt_log.g.dart';
 class DtLog {
   Id id = Isar.autoIncrement; // you can also use id = null to auto increment
 
+  String? logKey;
+
   String? color;
 
-  DateTime? requestedAt;
+  // DateTime? requestedAt;
+  //
+  // DateTime? lastAttemptedAt;
+  //
+  // DateTime? finishedAt;
 
-  DateTime? lastAttemptedAt;
+  DateTime? dateTime;
 
-  DateTime? finishedAt;
-
-  int? retryCount;
+  // int? retryCount;
 
   bool? hasFinished;
 
   @override
   String toString() {
-    return 'DtLog{id: $id, color: $color, requestedAt: $requestedAt, lastAttemptedAt: $lastAttemptedAt, finishedAt: $finishedAt, retryCount: $retryCount, hasFinished: $hasFinished}';
+    return 'DtLog{id: $id, logKey : $logKey, color: $color, requestedAt: $dateTime, hasFinished: $hasFinished}';
   }
+
+// @override
+// String toString() {
+//   return 'DtLog{id: $id, color: $color, requestedAt: $requestedAt, lastAttemptedAt: $lastAttemptedAt, finishedAt: $finishedAt, retryCount: $retryCount, hasFinished: $hasFinished}';
+// }
 }

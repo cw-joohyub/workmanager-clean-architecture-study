@@ -6,15 +6,17 @@ import 'dt_log.dart';
 abstract class LogLocalDatasource {
   Future<void> initDb();
 
-  Future<int> addLog(String color);
+  Future<int> addLog(String color, String logkey, bool remoteResult);
 
-  Future<bool> updateLog(int key, bool remoteResult);
+  // Future<bool> updateLog(int key, bool remoteResult);
 
   Future<bool> deleteAll();
 
   Future<Stream<void>?> watchLogChanged();
 
   Future<List<DtLog>?> getAllLog();
+
+  Future<int> getAllCount(String color);
 }
 
 @Injectable(as: LogLocalDatasource)
@@ -44,18 +46,19 @@ class LogLocalDatasourceImpl extends LogLocalDatasource {
   }
 
   @override
-  Future<int> addLog(String color) async {
+  Future<int> addLog(String color, String logkey, bool remoteResult) async {
     if (isar == null) {
       await initDb();
     }
     try {
       final DtLog logData = DtLog()
         ..color = color
-        ..requestedAt = DateTime.now()
-        ..lastAttemptedAt = zero
-        ..finishedAt = zero
-        ..retryCount = 0
-        ..hasFinished = false;
+        ..logKey = logkey
+        ..dateTime = DateTime.now()
+        // ..lastAttemptedAt = zero
+        // ..finishedAt = zero
+        // ..retryCount = 0
+        ..hasFinished = remoteResult;
 
       return await isar?.writeTxnSync(() {
             final id = isar?.dtLogs.putSync(logData);
@@ -68,35 +71,35 @@ class LogLocalDatasourceImpl extends LogLocalDatasource {
     }
   }
 
-  @override
-  Future<bool> updateLog(int key, bool remoteResult) async {
-    if (isar == null) {
-      await initDb();
-    }
-    try {
-      final DtLog? old = isar?.dtLogs.getSync(key); // get
-
-      if (old == null) {
-        return false;
-      }
-
-      old
-        ..lastAttemptedAt = DateTime.now()
-        ..finishedAt = DateTime.now()
-        ..retryCount = remoteResult ? old.retryCount : (old.retryCount! + 1)
-        ..hasFinished = remoteResult;
-
-      isar?.writeTxnSync(() {
-        final id = isar?.dtLogs.putSync(old);
-        return id;
-      });
-
-      return Future<bool>.value(true);
-    } catch (e) {
-      print(e);
-      throw Exception();
-    }
-  }
+  // @override
+  // Future<bool> updateLog(int key, bool remoteResult) async {
+  //   if (isar == null) {
+  //     await initDb();
+  //   }
+  //   try {
+  //     final DtLog? old = isar?.dtLogs.getSync(key); // get
+  //
+  //     if (old == null) {
+  //       return false;
+  //     }
+  //
+  //     old
+  //       // ..lastAttemptedAt = DateTime.now()
+  //       // ..finishedAt = DateTime.now()
+  //       // ..retryCount = remoteResult ? old.retryCount : (old.retryCount! + 1)
+  //       ..hasFinished = remoteResult;
+  //
+  //     isar?.writeTxnSync(() {
+  //       final id = isar?.dtLogs.putSync(old);
+  //       return id;
+  //     });
+  //
+  //     return Future<bool>.value(true);
+  //   } catch (e) {
+  //     print(e);
+  //     throw Exception();
+  //   }
+  // }
 
   @override
   Future<bool> deleteAll() async {
@@ -125,5 +128,22 @@ class LogLocalDatasourceImpl extends LogLocalDatasource {
     }
 
     return isar?.dtLogs.where().findAll();
+  }
+
+  @override
+  Future<int> getAllCount(String color) async {
+    if (isar == null) {
+      await initDb();
+    }
+
+    final int? result = isar?.dtLogs
+        .filter()
+        .hasFinishedEqualTo(true)
+        .and()
+        .colorEqualTo(color)
+        .findAllSync()
+        .length;
+
+    return result ?? 0;
   }
 }

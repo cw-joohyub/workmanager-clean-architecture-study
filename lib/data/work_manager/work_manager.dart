@@ -11,8 +11,7 @@ import '../../di/di.dart';
 const plusOneToRedTaskKey = 'plus_one_red3';
 const plusOneToBlackTaskKey = 'plus_one_black3';
 
-@pragma(
-    'vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
+@pragma('vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     print('[Workmanager] $task, $inputData');
@@ -22,12 +21,12 @@ void callbackDispatcher() {
       case plusOneToRedTaskKey:
         final logKey = inputData!['logKey']!;
         print('logKey - $logKey');
-        final result =
-            await getIt<NumberRemoteDatasource>().postAddEvent('red');
-        await getIt<LogLocalDatasource>().updateLog(logKey, result);
+        final result = await getIt<NumberRemoteDatasource>().postAddEvent('red');
+        // await getIt<LogLocalDatasource>().updateLog(logKey, result);
+        await getIt<LogLocalDatasource>().addLog('red', logKey, result);
 
         if (result) {
-          await getIt<NumberLocalDatasource>().plusOneNumber('red');
+          // await getIt<NumberLocalDatasource>().plusOneNumber('red');
 
           final sendPort = IsolateNameServer.lookupPortByName("backgroundtask");
           if (sendPort != null) {
@@ -46,11 +45,11 @@ void callbackDispatcher() {
         return Future.value(result);
       case plusOneToBlackTaskKey:
         final logKey = inputData!['logKey']!;
-        final result =
-            await getIt<NumberRemoteDatasource>().postAddEvent('black');
-        await getIt<LogLocalDatasource>().updateLog(logKey, result);
+        final result = await getIt<NumberRemoteDatasource>().postAddEvent('black');
+        // await getIt<LogLocalDatasource>().updateLog(logKey, result);
+        await getIt<LogLocalDatasource>().addLog('black', logKey, result);
         if (result) {
-          await getIt<NumberLocalDatasource>().plusOneNumber('black');
+          // await getIt<NumberLocalDatasource>().plusOneNumber('black');
 
           final sendPort = IsolateNameServer.lookupPortByName("backgroundtask");
           if (sendPort != null) {

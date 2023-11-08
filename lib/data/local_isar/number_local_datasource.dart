@@ -1,6 +1,7 @@
 import 'package:injectable/injectable.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
+import 'dt_log.dart';
 import 'dt_number.dart';
 
 abstract class NumberLocalDatasource {
@@ -32,7 +33,7 @@ class NumberLocalDatasourceImpl extends NumberLocalDatasource {
       // try {
       final dir = await getApplicationDocumentsDirectory();
       isar = await Isar.open(
-        [DtNumberSchema],
+        [DtNumberSchema, DtLogSchema],
         directory: dir.path,
         name: _isarInstanceName,
       );

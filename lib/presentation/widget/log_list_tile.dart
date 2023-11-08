@@ -7,7 +7,7 @@ import 'package:styled_widget/styled_widget.dart';
 import '../cubit/work_manager_cubit.dart';
 
 class LogListTile extends StatelessWidget {
-  final List<DateTime> datetime;
+  final DateTime datetime;
   final int retry;
   final EventType eventType;
   final bool isSuccess;
@@ -22,7 +22,7 @@ class LogListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DateTime lastDatetime = datetime.last;
+    final DateTime lastDatetime = datetime;
     final String lastFormattedDate =
         '${lastDatetime.year}-${lastDatetime.month.toString().padLeft(2, '0')}'
         '-${lastDatetime.day.toString().padLeft(2, '0')} '

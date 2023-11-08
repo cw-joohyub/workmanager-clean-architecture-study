@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:injectable/injectable.dart';
+import 'package:uuid/uuid.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:workmanager_clean_architecture_sample/data/local_isar/dt_log.dart';
 import 'package:workmanager_clean_architecture_sample/data/mapper/log_event_mapper.dart';
@@ -42,14 +43,16 @@ class NumberRepository {
   }
 
   Future<int> getLastNumber(String color) async {
-    return await _numberLocalDatasource.getNumber(color);
+    return await _logLocalDatasource.getAllCount(color);
+
+    // return await _numberLocalDatasource.getNumber(color);
   }
 
   Future<void> postPlusOne(String color) async {
     final String taskKey = color == 'red' ? plusOneToRedTaskKey : plusOneToBlackTaskKey;
-    final int logKey = await _logLocalDatasource.addLog(color);
+    // final int logKey = await _logLocalDatasource.addLog(color);
 
-    print('postPlusOne : $color, $logKey');
+    // print('postPlusOne : $color, $logKey');
 
     //Work Unique keys
     // Workmanager().registerOneOffTask('$taskKey$logKey', taskKey,
@@ -70,7 +73,7 @@ class NumberRepository {
         '$color-$i',
         taskKey,
         inputData: <String, dynamic>{
-          'logKey': logKey,
+          'logKey': const Uuid().v4(),
         },
         // constraints: Constraints(networkType: NetworkType.connected),
         backoffPolicy: BackoffPolicy.linear,

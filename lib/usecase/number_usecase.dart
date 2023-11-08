@@ -35,14 +35,14 @@ class NumberUsecaseImpl extends NumberUsecase {
   @override
   Future<Stream<void>?> watchLogChanged() => _numberRepository.watchLogChanged();
 
-  @override
-  LogEvent addLog(String taskName, int retryCount) {
-    DateTime timeStamp = DateTime.now();
-    print('NumberUsecaseImpl/addLog - $taskName, $timeStamp $retryCount');
-    // _numberRepository.addLog(taskName, timeStamp, retryCount);
-
-    return LogEvent(taskName, [timeStamp], retryCount + 1, EventType.red, true);
-  }
+  // @override
+  // LogEvent addLog(String taskName, int retryCount) {
+  //   DateTime timeStamp = DateTime.now();
+  //   print('NumberUsecaseImpl/addLog - $taskName, $timeStamp $retryCount');
+  //   // _numberRepository.addLog(taskName, timeStamp, retryCount);
+  //
+  //   return LogEvent(taskName, [timeStamp], retryCount + 1, EventType.red, true);
+  // }
 
   @override
   Future<List<LogEvent>> getAllLog() async {
@@ -52,5 +52,11 @@ class NumberUsecaseImpl extends NumberUsecase {
   @override
   Future<int> getLastNumber(String color) async {
     return await _numberRepository.getLastNumber(color);
+  }
+
+  @override
+  LogEvent addLog(String taskName, int retryCount) {
+    // TODO: implement addLog
+    throw UnimplementedError();
   }
 }
