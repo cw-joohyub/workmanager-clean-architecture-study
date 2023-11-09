@@ -25,7 +25,7 @@ class LogEvent {
 class WorkManagerState {
   final int redCount;
   final int blackCount;
-  final Map<String, LogEvent> logEvents;
+  final Map<String, List<LogEvent>> logEvents;
 
   WorkManagerState({
     this.redCount = 0,
@@ -36,7 +36,7 @@ class WorkManagerState {
   WorkManagerState copyWith({
     int? redCount,
     int? blackCount,
-    Map<String, LogEvent>? logEvents,
+    Map<String, List<LogEvent>>? logEvents,
   }) {
     return WorkManagerState(
       redCount: redCount ?? this.redCount,
@@ -54,27 +54,24 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
       : super(WorkManagerState(blackCount: 0, redCount: 0, logEvents: {}));
 
   Future<void> init() async {
-    // final redStream = await _numberUsecase.watchChange('red');
-    // final blackStream = await _numberUsecase.watchChange('black');
     final logStream = await _numberUsecase.watchLogChanged();
 
-    // redStream?.listen((event) async {
-    //   int resultNumber = await _numberUsecase.getLastNumber('red');
-    //   emit(state.copyWith(redCount: resultNumber));
-    // });
-    //
-    // blackStream?.listen((event) async {
-    //   int resultNumber = await _numberUsecase.getLastNumber('black');
-    //   emit(state.copyWith(blackCount: resultNumber));
-    // });
-
     logStream?.listen((event) async {
-      Map<String, LogEvent> logEvents = {for (var e in await _numberUsecase.getAllLog()) e.id: e};
+      Map<String, List<LogEvent>> logEvents = {};
+      List<LogEvent> logList = await _numberUsecase.getAllLog();
+      for(int i = 0 ; i < logList.length ; i++){
+        if(logEvents.containsKey(logList[i].id)){
+          logEvents[logList[i].id]?.add(logList[i]);
+        }else{
+          logEvents[logList[i].id] = [logList[i]];
+        }
+      }
 
       int redCount = await _numberUsecase.getLastNumber('red');
       int blackCount = await _numberUsecase.getLastNumber('black');
 
-      emit(state.copyWith(redCount: redCount, blackCount: blackCount, logEvents: logEvents));
+      emit(state.copyWith(
+          redCount: redCount, blackCount: blackCount, logEvents: logEvents));
     });
   }
 
@@ -115,4 +112,9 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
 //     }
 //   });
 // }
+}
+
+extension on Map<String, LogEvent> {
+
+
 }

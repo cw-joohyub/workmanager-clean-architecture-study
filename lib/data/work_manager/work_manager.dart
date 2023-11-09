@@ -2,71 +2,66 @@ import 'dart:ui';
 
 import 'package:workmanager/workmanager.dart';
 import 'package:workmanager_clean_architecture_sample/data/local_csv/dt_csv_log.dart';
+import 'package:workmanager_clean_architecture_sample/presentation/cubit/work_manager_cubit.dart';
+
+import '../../di/di.dart';
 import '../local_csv/csv_log_local_datasource.dart';
 import '../local_isar/log_local_datasource.dart';
-import '../local_isar/number_local_datasource.dart';
 import '../remote/number_remote_datasource.dart';
-import '../../di/di.dart';
 
 const plusOneToRedTaskKey = 'plus_one_red3';
 const plusOneToBlackTaskKey = 'plus_one_black3';
 
-@pragma('vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
+@pragma(
+    'vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     print('[Workmanager] $task, $inputData');
     getItInit();
 
-    switch (task) {
-      case plusOneToRedTaskKey:
-        final logKey = inputData!['logKey']!;
-        print('logKey - $logKey');
-        final result = await getIt<NumberRemoteDatasource>().postAddEvent('red');
-        // await getIt<LogLocalDatasource>().updateLog(logKey, result);
-        await getIt<LogLocalDatasource>().addLog('red', logKey, result);
+    EventType eventType =
+        task == plusOneToRedTaskKey ? EventType.red : EventType.black;
 
-        if (result) {
-          // await getIt<NumberLocalDatasource>().plusOneNumber('red');
+    final LogLocalDatasource logLocalDatasource = getIt<LogLocalDatasource>();
+    final CsvLogLocalDataSource csvLogLocalDataSource =
+        getIt<CsvLogLocalDataSource>();
 
-          final sendPort = IsolateNameServer.lookupPortByName("backgroundtask");
-          if (sendPort != null) {
-            sendPort.send('updateUi');
-          }
-        }
+    final logKey = inputData!['logKey']!;
+    print('logKey - $logKey');
+    final isSuccess = await getIt<NumberRemoteDatasource>().postAddEvent(eventType.name);
+    await logLocalDatasource.addLog(eventType.name, logKey, isSuccess);
 
-        final DtCsvLog log = DtCsvLog(
-          color: 'red',
-          id: logKey.toString(),
-          timestamp: DateTime.now().toIso8601String(),
-          isFinished: result,
-        );
-        await getIt<CsvLogLocalDataSource>().appendLog(log);
+    final sendPort = IsolateNameServer.lookupPortByName("backgroundtask");
+    sendPort?.send('updateUi');
 
-        return Future.value(result);
-      case plusOneToBlackTaskKey:
-        final logKey = inputData!['logKey']!;
-        final result = await getIt<NumberRemoteDatasource>().postAddEvent('black');
-        // await getIt<LogLocalDatasource>().updateLog(logKey, result);
-        await getIt<LogLocalDatasource>().addLog('black', logKey, result);
-        if (result) {
-          // await getIt<NumberLocalDatasource>().plusOneNumber('black');
+    final DtCsvLog log = DtCsvLog(
+      color: eventType.name,
+      id: logKey.toString(),
+      timestamp: DateTime.now().toIso8601String(),
+      isFinished: isSuccess,
+    );
+    await csvLogLocalDataSource.appendLog(log);
 
-          final sendPort = IsolateNameServer.lookupPortByName("backgroundtask");
-          if (sendPort != null) {
-            sendPort.send('updateUi');
-          }
-        }
+    await Future.delayed(const Duration(seconds: 5));
 
-        final DtCsvLog log = DtCsvLog(
-          color: 'black',
-          id: logKey.toString(),
-          timestamp: DateTime.now().toIso8601String(),
-          isFinished: result,
-        );
-        await getIt<CsvLogLocalDataSource>().appendLog(log);
+    final int failureCount = await logLocalDatasource.getFailureCount(logKey.toString());
+    if(!isSuccess && failureCount > 0){
 
-        return Future.value(result);
+      Workmanager().registerOneOffTask(
+        eventType.name,
+        task,
+        inputData: <String, dynamic>{
+          'logKey': logKey,
+        },
+        backoffPolicy: BackoffPolicy.linear,
+        backoffPolicyDelay: const Duration(milliseconds: 500),
+        initialDelay: const Duration(milliseconds: 100),
+        existingWorkPolicy: ExistingWorkPolicy.append,
+      );
+
+      return Future.value(true);
     }
-    return Future.value(true);
+
+    return Future.value(isSuccess);
   });
 }

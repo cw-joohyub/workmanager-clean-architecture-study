@@ -69,7 +69,7 @@ class _CounterPanelState extends State<CounterPanel> {
 
     final int totalCount = state.logEvents
         .values
-        .where((element) => element.eventType == widget.eventType)
+        .where((List<LogEvent> element) => element[0].eventType == widget.eventType)
         .length;
 
     final String percentage =

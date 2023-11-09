@@ -50,12 +50,13 @@ class EventLogPanel extends StatelessWidget {
             width: 400,
             height: 280,
             child: ListView(
-              children: state.logEvents.values.map((LogEvent e) {
+              children: state.logEvents.values.map((List<LogEvent> e) {
                 return LogListTile(
-                    datetime: e.dateTime,
-                    retry: 0,
-                    eventType: e.eventType,
-                    isSuccess: e.isSuccess);
+                    datetime: e.first.dateTime,
+                    retry: e.where((LogEvent e) => !e.isSuccess).length-1,
+                    eventType: e.first.eventType,
+                    isSuccess: e.last.isSuccess,
+                    isInvalid: e.where((LogEvent e) => e.isSuccess).length > 1,);
               }).toList(),
             ),
           ),

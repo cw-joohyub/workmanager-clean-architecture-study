@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:glass_kit/glass_kit.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:workmanager/workmanager.dart';
 
 import '../cubit/work_manager_cubit.dart';
 import 'log_list_tile.dart';
@@ -17,7 +18,10 @@ class RemainEventLogPanel extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 10),
       borderRadius: BorderRadius.circular(20),
       gradient: LinearGradient(
-        colors: [Colors.deepPurple.withOpacity(0.60), Colors.deepPurpleAccent.withOpacity(0.20)],
+        colors: [
+          Colors.deepPurple.withOpacity(0.60),
+          Colors.deepPurpleAccent.withOpacity(0.20)
+        ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
@@ -47,10 +51,14 @@ class RemainEventLogPanel extends StatelessWidget {
             width: 400,
             height: 280,
             child: ListView(
-              children:
-                  state.logEvents.values.where((LogEvent e) => !e.isSuccess).map((LogEvent e) {
+              children: state.logEvents.values
+                  .where((List<LogEvent> e) => !e.last.isSuccess)
+                  .map((List<LogEvent> e) {
                 return LogListTile(
-                    datetime: e.dateTime, retry: 0, eventType: e.eventType, isSuccess: e.isSuccess);
+                    datetime: e.first.dateTime,
+                    retry: e.where((LogEvent e) => !e.isSuccess).length-1,
+                    eventType: e.first.eventType,
+                    isSuccess: e.last.isSuccess);
               }).toList(),
             ),
           ),

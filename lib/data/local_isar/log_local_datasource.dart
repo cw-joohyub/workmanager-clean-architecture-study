@@ -8,7 +8,11 @@ abstract class LogLocalDatasource {
 
   Future<int> addLog(String color, String logkey, bool remoteResult);
 
+  Future<int> getFailureCount(String logkey);
+
   // Future<bool> updateLog(int key, bool remoteResult);
+
+  Future<int> deleteAllByLogKey(String logKey);
 
   Future<bool> deleteAll();
 
@@ -145,5 +149,36 @@ class LogLocalDatasourceImpl extends LogLocalDatasource {
         .length;
 
     return result ?? 0;
+  }
+
+  @override
+  Future<int> getFailureCount(String logkey) async {
+    if (isar == null) {
+      await initDb();
+    }
+
+    final int? result = isar?.dtLogs
+        .filter()
+        .hasFinishedEqualTo(false)
+        .and()
+        .logKeyEqualTo(logkey)
+        .findAllSync()
+        .length;
+
+    return result ?? 0;
+  }
+
+  @override
+  Future<int> deleteAllByLogKey(String logKey) async {
+    if (isar == null) {
+      await initDb();
+    }
+
+    return await isar?.writeTxnSync(() {
+          final int? result =
+              isar?.dtLogs.filter().logKeyEqualTo(logKey).deleteAllSync();
+          return result;
+        }) ??
+        0;
   }
 }

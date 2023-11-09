@@ -82,7 +82,7 @@ class SuccessRatePlot extends StatelessWidget {
                       color: Colors.red,
                       toY: state.logEvents
                           .values
-                          .where((element) => element.eventType == EventType.red)
+                          .where((List<LogEvent> element) => element.first.eventType == EventType.red)
                           .length
                           .toDouble(),
                       width: 20,
@@ -98,7 +98,7 @@ class SuccessRatePlot extends StatelessWidget {
                       color: Colors.black,
                       toY: state.logEvents
                           .values
-                          .where((element) => element.eventType == EventType.black)
+                          .where((List<LogEvent> element) => element.first.eventType == EventType.black)
                           .length
                           .toDouble(),
                       width: 20,

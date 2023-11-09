@@ -11,13 +11,15 @@ class LogListTile extends StatelessWidget {
   final int retry;
   final EventType eventType;
   final bool isSuccess;
+  final bool isInvalid;
 
   const LogListTile(
       {Key? key,
       required this.datetime,
       required this.retry,
       required this.eventType,
-      required this.isSuccess})
+      required this.isSuccess,
+      this.isInvalid = false})
       : super(key: key);
 
   @override
@@ -31,6 +33,18 @@ class LogListTile extends StatelessWidget {
         '${lastDatetime.second.toString().padLeft(2, '0')}.'
         '${lastDatetime.millisecond.toString().padLeft(3, '0')}';
 
+    Icon? icon = isSuccess
+        ? const Icon(
+            Icons.check_circle,
+            color: Colors.greenAccent)
+        : null;
+
+    if(isInvalid) {
+      icon = const Icon(
+      Icons.error,
+      color: Colors.redAccent);
+    }
+
     return GFListTile(
       avatar: GFAvatar(
         size: GFSize.SMALL,
@@ -39,9 +53,7 @@ class LogListTile extends StatelessWidget {
             style: const TextStyle(color: Colors.white)),
       ),
       title: Text('$lastFormattedDate / retry : $retry').bold(),
-      icon: isSuccess ? const Icon(
-        Icons.check_circle,
-        color: Colors.greenAccent) : null,
+      icon: icon,
     );
   }
 }

@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:dart_ping/dart_ping.dart';
 import 'package:injectable/injectable.dart';
 
-const int successRate = 80;
+const int successRate = 0;
 const int fakeDelayMilliseconds = 10;
 
 @injectable
@@ -16,7 +16,7 @@ class NumberRemoteDatasource {
     //   return false;
     // }
     return Future<bool>.delayed(const Duration(milliseconds: fakeDelayMilliseconds), () {
-      return Random().nextInt(100) <= successRate;
+      return Random().nextInt(100) < successRate;
     });
 
     // return Future<bool>.delayed(const Duration(milliseconds: fakeDelayMilliseconds), () {
