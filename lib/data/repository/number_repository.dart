@@ -29,8 +29,7 @@ class NumberRepository {
     return _numberLocalDatasource.watchChange(color);
   }
 
-  Future<Stream<void>?> watchLogChanged() =>
-      _logLocalDatasource.watchLogChanged();
+  Future<Stream<void>?> watchLogChanged() => _logLocalDatasource.watchLogChanged();
 
   Future<List<LogEvent>> getAllLog() async {
     List<DtLog>? dtLogList = await _logLocalDatasource.getAllLog();
@@ -39,9 +38,8 @@ class NumberRepository {
       return [];
     }
 
-    List<LogEvent> result = dtLogList
-        .map((DtLog log) => LogEventMapper().mapToLogEvent(log))
-        .toList();
+    List<LogEvent> result =
+        dtLogList.map((DtLog log) => LogEventMapper().mapToLogEvent(log)).toList();
 
     return result;
   }
@@ -53,8 +51,7 @@ class NumberRepository {
   }
 
   Future<void> postPlusOne(String color) async {
-    final String taskKey =
-        color == 'red' ? plusOneToRedTaskKey : plusOneToBlackTaskKey;
+    final String taskKey = color == 'red' ? plusOneToRedTaskKey : plusOneToBlackTaskKey;
     // final int logKey = await _logLocalDatasource.addLog(color);
 
     // print('postPlusOne : $color, $logKey');
@@ -77,9 +74,11 @@ class NumberRepository {
     // for (int i = 0; i < 3; i++) {
     await getIt<LogLocalDatasource>().addLog(color, logKey, false);
     Workmanager().registerOneOffTask(
-      color,
-      taskKey,
+      iosTest,
+      iosTest,
       inputData: <String, dynamic>{
+        'color': color,
+        'taskKey': taskKey,
         'logKey': logKey,
       },
       // constraints: Constraints(networkType: NetworkType.connected),

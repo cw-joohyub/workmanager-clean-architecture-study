@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:dart_ping/dart_ping.dart';
 import 'package:injectable/injectable.dart';
 
-const int successRate = 0;
+const int successRate = 100;
 const int fakeDelayMilliseconds = 10;
 
 @injectable
