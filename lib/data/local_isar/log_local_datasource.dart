@@ -1,6 +1,7 @@
 import 'package:injectable/injectable.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:workmanager_clean_architecture_sample/data/local_isar/isar_helper.dart';
 import 'dt_log.dart';
 
 abstract class LogLocalDatasource {
@@ -26,27 +27,10 @@ abstract class LogLocalDatasource {
 @Injectable(as: LogLocalDatasource)
 class LogLocalDatasourceImpl extends LogLocalDatasource {
   Isar? isar;
-  static const String _isarInstanceName = 'logInstance';
-
-  final DateTime zero = DateTime.fromMicrosecondsSinceEpoch(0);
 
   @override
   Future<void> initDb() async {
-    isar = Isar.getInstance(_isarInstanceName);
-
-    if (isar == null) {
-      // try {
-      final dir = await getApplicationDocumentsDirectory();
-      isar = await Isar.open(
-        [DtLogSchema],
-        directory: dir.path,
-        name: _isarInstanceName,
-      );
-      // } catch (exception) {
-      //   print(exception.toString());
-      //   throw Exception();
-      // }
-    }
+    isar = await IsarHelper.getInstance();
   }
 
   @override

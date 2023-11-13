@@ -1,6 +1,7 @@
 import 'package:injectable/injectable.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:workmanager_clean_architecture_sample/data/local_isar/isar_helper.dart';
 import 'dt_log.dart';
 import 'dt_number.dart';
 
@@ -21,27 +22,13 @@ abstract class NumberLocalDatasource {
 @Injectable(as: NumberLocalDatasource)
 class NumberLocalDatasourceImpl extends NumberLocalDatasource {
   Isar? isar;
-  static const String _isarInstanceName = 'numberInstance';
+  static const String _isarInstanceName = 'isarInstance';
 
   final DateTime zero = DateTime.fromMicrosecondsSinceEpoch(0);
 
   @override
   Future<void> initDb() async {
-    isar = Isar.getInstance(_isarInstanceName);
-
-    if (isar == null) {
-      // try {
-      final dir = await getApplicationDocumentsDirectory();
-      isar = await Isar.open(
-        [DtNumberSchema, DtLogSchema],
-        directory: dir.path,
-        name: _isarInstanceName,
-      );
-      // } catch (exception) {
-      //   print(exception.toString());
-      //   throw Exception();
-      // }
-    }
+    isar = await IsarHelper.getInstance();
   }
 
   @override
