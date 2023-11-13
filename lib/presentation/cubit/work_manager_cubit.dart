@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:injectable/injectable.dart';
@@ -112,9 +111,4 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
 //     }
 //   });
 // }
-}
-
-extension on Map<String, LogEvent> {
-
-
 }

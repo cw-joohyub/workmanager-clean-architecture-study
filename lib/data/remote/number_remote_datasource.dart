@@ -1,13 +1,11 @@
 import 'dart:math';
-import 'package:dart_ping/dart_ping.dart';
-import 'package:injectable/injectable.dart';
 
-const int successRate = 100;
-const int fakeDelayMilliseconds = 10;
+import 'package:injectable/injectable.dart';
 
 @injectable
 class NumberRemoteDatasource {
-  Future<bool> postAddEvent(String color) async {
+
+  Future<bool> postAddEvent(String color, int fakeDelayMilliseconds, int successRate) async {
     // final PingData result = await Ping('google.com', count: 1).stream.first;
     //
     // print('result - $result');
@@ -15,7 +13,7 @@ class NumberRemoteDatasource {
     //   print('error! - ${result.error}');
     //   return false;
     // }
-    return Future<bool>.delayed(const Duration(milliseconds: fakeDelayMilliseconds), () {
+    return Future<bool>.delayed(Duration(milliseconds: fakeDelayMilliseconds), () {
       return Random().nextInt(100) < successRate;
     });
 

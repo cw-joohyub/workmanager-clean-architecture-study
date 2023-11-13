@@ -13,7 +13,8 @@ const plusOneToRedTaskKey = 'plus_one_red3';
 const plusOneToBlackTaskKey = 'plus_one_black3';
 const iosTest = 'be.tramckrijte.workmanagerExample.taskId';
 
-@pragma('vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
+@pragma(
+    'vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     print('[Workmanager] $task, $inputData');
@@ -23,12 +24,19 @@ void callbackDispatcher() {
     // final String taskKey = inputData['taskKey']!;
     EventType eventType = color == 'red' ? EventType.red : EventType.black;
 
+    final int successRate = inputData['successRate'] ?? 100;
+    final int fakeDelayMilliseconds = inputData['fakeDelayMilliseconds'] ?? 10;
+    final bool isImprovedAppend = inputData['isImprovedAppend'] ?? false;
+    final bool isPeriodicTask = inputData['isPeriodicTask'] ?? false;
+
     final LogLocalDatasource logLocalDatasource = getIt<LogLocalDatasource>();
-    final CsvLogLocalDataSource csvLogLocalDataSource = getIt<CsvLogLocalDataSource>();
+    final CsvLogLocalDataSource csvLogLocalDataSource =
+        getIt<CsvLogLocalDataSource>();
 
     final logKey = inputData['logKey']!;
     print('logKey - $logKey');
-    final isSuccess = await getIt<NumberRemoteDatasource>().postAddEvent(eventType.name);
+    final isSuccess = await getIt<NumberRemoteDatasource>()
+        .postAddEvent(eventType.name, fakeDelayMilliseconds, successRate);
     await logLocalDatasource.addLog(eventType.name, logKey, isSuccess);
 
     final sendPort = IsolateNameServer.lookupPortByName("backgroundtask");
@@ -42,26 +50,26 @@ void callbackDispatcher() {
     );
     await csvLogLocalDataSource.appendLog(log);
 
-    // await Future.delayed(const Duration(seconds: 5));
-    //
-    // final int failureCount = await logLocalDatasource.getFailureCount(logKey.toString());
-    // if (!isSuccess && failureCount > 0) {
-    //   Workmanager().registerOneOffTask(
-    //     iosTest,
-    //     iosTest,
-    //     inputData: <String, dynamic>{
-    //       'color': color,
-    //       'taskKey': taskKey,
-    //       'logKey': logKey,
-    //     },
-    //     backoffPolicy: BackoffPolicy.linear,
-    //     backoffPolicyDelay: const Duration(milliseconds: 500),
-    //     initialDelay: const Duration(milliseconds: 100),
-    //     existingWorkPolicy: ExistingWorkPolicy.append,
-    //   );
-    //
-    //   return Future.value(true);
-    // }
+    final int failureCount = await logLocalDatasource.getFailureCount(logKey.toString());
+    if (!isSuccess && failureCount > 0 && isImprovedAppend && !isPeriodicTask) {
+      Workmanager().registerOneOffTask(
+        iosTest,
+        iosTest,
+        inputData: <String, dynamic>{
+          'color': color,
+          'logKey': logKey,
+          'successRate': successRate,
+          'fakeDelayMilliseconds': fakeDelayMilliseconds,
+          'isImprovedAppend': isImprovedAppend,
+        },
+        backoffPolicy: BackoffPolicy.linear,
+        backoffPolicyDelay: const Duration(milliseconds: 500),
+        initialDelay: const Duration(milliseconds: 100),
+        existingWorkPolicy: ExistingWorkPolicy.append,
+      );
+
+      return Future.value(true);
+    }
 
     return Future.value(isSuccess);
   });

@@ -111,9 +111,10 @@ class LogLocalDatasourceImpl extends LogLocalDatasource {
       await initDb();
     }
 
-    isar?.dtLogs.clearSync();
-
-    return Future<bool>.value(true);
+    return await isar?.writeTxnSync(() {
+      isar?.dtLogs.clearSync();
+      return true;
+    }) ?? false;
   }
 
   @override

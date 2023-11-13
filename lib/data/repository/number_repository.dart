@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:injectable/injectable.dart';
 import 'package:uuid/uuid.dart';
 import 'package:workmanager/workmanager.dart';
@@ -16,8 +14,24 @@ import '../work_manager/work_manager.dart';
 class NumberRepository {
   NumberRepository(this._numberLocalDatasource, this._logLocalDatasource);
 
+  static int successRate = 100;
+  static int fakeDelayMilliseconds = 10;
+  static bool isImprovedAppend = false;
+  static bool isPeriodicTask = false;
+
   final NumberLocalDatasource _numberLocalDatasource;
   final LogLocalDatasource _logLocalDatasource;
+
+  static void setOption(
+      {int? successRate, int? fakeDelayMilliseconds, bool? isImprovedAppend, bool? isPeriodicTask}) {
+    NumberRepository.successRate = successRate ?? NumberRepository.successRate;
+    NumberRepository.fakeDelayMilliseconds =
+        fakeDelayMilliseconds ?? NumberRepository.fakeDelayMilliseconds;
+    NumberRepository.isImprovedAppend =
+        isImprovedAppend ?? NumberRepository.isImprovedAppend;
+    NumberRepository.isPeriodicTask =
+        isPeriodicTask ?? NumberRepository.isPeriodicTask;
+  }
 
   Future<int> getNumber(String color) async {
     return _numberLocalDatasource.getNumber(color);
@@ -29,7 +43,8 @@ class NumberRepository {
     return _numberLocalDatasource.watchChange(color);
   }
 
-  Future<Stream<void>?> watchLogChanged() => _logLocalDatasource.watchLogChanged();
+  Future<Stream<void>?> watchLogChanged() =>
+      _logLocalDatasource.watchLogChanged();
 
   Future<List<LogEvent>> getAllLog() async {
     List<DtLog>? dtLogList = await _logLocalDatasource.getAllLog();
@@ -38,8 +53,9 @@ class NumberRepository {
       return [];
     }
 
-    List<LogEvent> result =
-        dtLogList.map((DtLog log) => LogEventMapper().mapToLogEvent(log)).toList();
+    List<LogEvent> result = dtLogList
+        .map((DtLog log) => LogEventMapper().mapToLogEvent(log))
+        .toList();
 
     return result;
   }
@@ -51,7 +67,8 @@ class NumberRepository {
   }
 
   Future<void> postPlusOne(String color) async {
-    final String taskKey = color == 'red' ? plusOneToRedTaskKey : plusOneToBlackTaskKey;
+    final String taskKey =
+        color == 'red' ? plusOneToRedTaskKey : plusOneToBlackTaskKey;
     // final int logKey = await _logLocalDatasource.addLog(color);
 
     // print('postPlusOne : $color, $logKey');
@@ -73,21 +90,49 @@ class NumberRepository {
     String logKey = const Uuid().v4();
     // for (int i = 0; i < 3; i++) {
     await getIt<LogLocalDatasource>().addLog(color, logKey, false);
-    Workmanager().registerOneOffTask(
-      iosTest,
-      iosTest,
-      inputData: <String, dynamic>{
-        'color': color,
-        'taskKey': taskKey,
-        'logKey': logKey,
-      },
-      // constraints: Constraints(networkType: NetworkType.connected),
-      backoffPolicy: BackoffPolicy.linear,
-      backoffPolicyDelay: const Duration(milliseconds: 500),
-      initialDelay: const Duration(milliseconds: 100),
-      existingWorkPolicy: ExistingWorkPolicy.append,
-      // outOfQuotaPolicy: OutOfQuotaPolicy.run_as_non_expedited_work_request,
-    );
-    // }
+
+    if (isPeriodicTask) {
+      Workmanager().registerPeriodicTask(
+        iosTest,
+        iosTest,
+        inputData: <String, dynamic>{
+          'color': color,
+          'taskKey': taskKey,
+          'logKey': logKey,
+          'successRate': successRate,
+          'fakeDelayMilliseconds': fakeDelayMilliseconds,
+          'isImprovedAppend': isImprovedAppend,
+          'isPeriodicTask': isPeriodicTask,
+        },
+        frequency: const Duration(seconds: 5),
+        // constraints: Constraints(networkType: NetworkType.connected),
+        backoffPolicy: BackoffPolicy.linear,
+        backoffPolicyDelay: const Duration(milliseconds: 500),
+        initialDelay: const Duration(milliseconds: 100),
+        existingWorkPolicy: ExistingWorkPolicy.append,
+        // outOfQuotaPolicy: OutOfQuotaPolicy.run_as_non_expedited_work_request,
+      );
+    }else {
+
+      Workmanager().registerOneOffTask(
+        iosTest,
+        iosTest,
+        inputData: <String, dynamic>{
+          'color': color,
+          'taskKey': taskKey,
+          'logKey': logKey,
+          'successRate': successRate,
+          'fakeDelayMilliseconds': fakeDelayMilliseconds,
+          'isImprovedAppend': isImprovedAppend,
+          'isPeriodicTask': isPeriodicTask,
+        },
+        // constraints: Constraints(networkType: NetworkType.connected),
+        backoffPolicy: BackoffPolicy.linear,
+        backoffPolicyDelay: const Duration(milliseconds: 500),
+        initialDelay: const Duration(milliseconds: 100),
+        existingWorkPolicy: ExistingWorkPolicy.append,
+        // outOfQuotaPolicy: OutOfQuotaPolicy.run_as_non_expedited_work_request,
+      );
+    }
   }
 }

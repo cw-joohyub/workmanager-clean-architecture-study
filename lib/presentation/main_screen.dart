@@ -4,10 +4,10 @@ import 'package:getwidget/components/button/gf_button.dart';
 import 'package:getwidget/components/carousel/gf_carousel.dart';
 import 'package:getwidget/size/gf_size.dart';
 import 'package:styled_widget/styled_widget.dart';
-import 'package:uuid/uuid.dart';
 import 'package:workmanager_clean_architecture_sample/di/di.dart';
 import 'package:workmanager_clean_architecture_sample/presentation/cubit/work_manager_cubit.dart';
 import 'package:workmanager_clean_architecture_sample/presentation/widget/event_log_panel.dart';
+import 'package:workmanager_clean_architecture_sample/presentation/widget/option_panel.dart';
 import 'package:workmanager_clean_architecture_sample/presentation/widget/remain_event_log_panel.dart';
 
 import '../util/gaps.dart';
@@ -35,12 +35,12 @@ class MainScreen extends StatelessWidget {
                     Gaps.vGap10,
                     [const CounterPanel(EventType.red), const CounterPanel(EventType.black)]
                         .toRow(mainAxisAlignment: MainAxisAlignment.spaceAround),
-                    const SizedBox(height: 20),
+                    Gaps.vGap20,
                     [
                       _buildWorkStartButton(context, EventType.red),
                       _buildWorkStartButton(context, EventType.black)
                     ].toRow(mainAxisAlignment: MainAxisAlignment.spaceAround),
-                    const SizedBox(height: 20),
+                    const OptionPanel(),
                     GFCarousel(
                         height: 350,
                         passiveIndicator: Colors.grey,
@@ -50,7 +50,8 @@ class MainScreen extends StatelessWidget {
                           const EventLogPanel(),
                           SuccessRatePlot(),
                           const RemainEventLogPanel()
-                        ])
+                        ]),
+                    Gaps.vGap20,
                   ],
                 ),
               ),
