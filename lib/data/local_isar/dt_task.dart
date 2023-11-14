@@ -6,6 +6,40 @@ enum EventType { red, black }
 
 enum TaskStatus { open, inProgress, done, canceled }
 
+extension TaskStatusExtension on TaskStatus {
+  String taskStatusToString() {
+    switch (this) {
+      case TaskStatus.open:
+        return 'open';
+      case TaskStatus.inProgress:
+        return 'inProgress';
+      case TaskStatus.done:
+        return 'done';
+      case TaskStatus.canceled:
+        return 'canceled';
+      default:
+        throw ArgumentError('Invalid TaskStatus value: $this');
+    }
+  }
+}
+
+extension StringTaskStatusExtension on String {
+  TaskStatus toTaskStatus() {
+    switch (this) {
+      case 'open':
+        return TaskStatus.open;
+      case 'inProgress':
+        return TaskStatus.inProgress;
+      case 'done':
+        return TaskStatus.done;
+      case 'canceled':
+        return TaskStatus.canceled;
+      default:
+        throw ArgumentError('Invalid TaskStatus string: $this');
+    }
+  }
+}
+
 @collection
 class DtTask {
   Id id = Isar.autoIncrement;
