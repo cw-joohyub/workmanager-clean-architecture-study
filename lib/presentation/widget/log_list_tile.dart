@@ -4,6 +4,7 @@ import 'package:getwidget/components/list_tile/gf_list_tile.dart';
 import 'package:getwidget/size/gf_size.dart';
 import 'package:styled_widget/styled_widget.dart';
 
+import '../../data/local_isar/dt_task.dart';
 import '../cubit/work_manager_cubit.dart';
 
 class LogListTile extends StatelessWidget {

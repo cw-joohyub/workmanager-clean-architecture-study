@@ -6,7 +6,7 @@ import 'package:getwidget/components/toggle/gf_toggle.dart';
 import 'package:getwidget/types/gf_toggle_type.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:workmanager/workmanager.dart';
-import 'package:workmanager_clean_architecture_sample/data/repository/number_repository.dart';
+import 'package:workmanager_clean_architecture_sample/data/repository/task_repository.dart';
 import 'package:workmanager_clean_architecture_sample/di/di.dart';
 import 'package:workmanager_clean_architecture_sample/util/gaps.dart';
 
@@ -44,7 +44,7 @@ class _OptionPanelState extends State<OptionPanel> {
                     successRate -= 10;
                   }
                 });
-                NumberRepository.setOption(
+                TaskRepository.setOption(
                     successRate: (successRate).toInt());
               },
               child: const Icon(CupertinoIcons.arrow_down)),
@@ -55,7 +55,7 @@ class _OptionPanelState extends State<OptionPanel> {
                     successRate += 10;
                   }
                 });
-                NumberRepository.setOption(
+                TaskRepository.setOption(
                     successRate: (successRate).toInt());
               },
               child: const Icon(CupertinoIcons.arrow_up)),
@@ -64,7 +64,7 @@ class _OptionPanelState extends State<OptionPanel> {
             setState(() {
               successRate = (progress * 100).toInt();
             });
-            NumberRepository.setOption(
+            TaskRepository.setOption(
                 successRate: (successRate).toInt());
           },
         ),
@@ -77,7 +77,7 @@ class _OptionPanelState extends State<OptionPanel> {
                     fakeDelayMilliseconds -= 100;
                   }
                 });
-                NumberRepository.setOption(
+                TaskRepository.setOption(
                     fakeDelayMilliseconds: fakeDelayMilliseconds);
               },
               child: const Icon(CupertinoIcons.arrow_down)),
@@ -88,7 +88,7 @@ class _OptionPanelState extends State<OptionPanel> {
                     fakeDelayMilliseconds += 100;
                   }
                 });
-                NumberRepository.setOption(
+                TaskRepository.setOption(
                     fakeDelayMilliseconds: fakeDelayMilliseconds);
               },
               child: const Icon(CupertinoIcons.arrow_up)),
@@ -97,7 +97,7 @@ class _OptionPanelState extends State<OptionPanel> {
             setState(() {
               fakeDelayMilliseconds = (progress * 5000).toInt();
             });
-            NumberRepository.setOption(
+            TaskRepository.setOption(
                 fakeDelayMilliseconds: fakeDelayMilliseconds);
           },
         ),
@@ -108,7 +108,7 @@ class _OptionPanelState extends State<OptionPanel> {
             setState(() {
               isImprovedAppend = value!;
             });
-            NumberRepository.setOption(
+            TaskRepository.setOption(
                 isImprovedAppend: isImprovedAppend);
           },
           value: isImprovedAppend,
@@ -124,7 +124,7 @@ class _OptionPanelState extends State<OptionPanel> {
             setState(() {
               isPeriodicTask = value!;
             });
-            NumberRepository.setOption(
+            TaskRepository.setOption(
                 isPeriodicTask: isPeriodicTask);
           },
           value: isPeriodicTask,

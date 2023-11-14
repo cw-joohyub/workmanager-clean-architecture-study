@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:glass_kit/glass_kit.dart';
 import 'package:styled_widget/styled_widget.dart';
+import '../../data/local_isar/dt_task.dart';
 import '../cubit/work_manager_cubit.dart';
 
 class CounterPanel extends StatefulWidget {

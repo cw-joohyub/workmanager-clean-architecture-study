@@ -1,26 +1,25 @@
 import '../../presentation/cubit/work_manager_cubit.dart';
 import '../local_isar/dt_log.dart';
+import '../local_isar/dt_task.dart';
 
 class LogEventMapper {
-  LogEvent mapToLogEvent(DtLog dtLog) {
+  LogEvent mapToLogEvent(DtTask dtTask) {
     return LogEvent(
-      dtLog.logKey ?? '',
+      dtTask.taskKey ?? '',
       // [dtLog.requestedAt ?? DateTime.now(), dtLog.lastAttemptedAt ?? DateTime.now()],
       // dtLog.retryCount ?? 0,
-      dtLog.dateTime ?? DateTime.now(),
-      dtLog.color! == 'red' ? EventType.red : EventType.black,
-      dtLog.hasFinished ?? false,
+      dtTask.dateTime ?? DateTime.now(),
+      dtTask.eventType = dtTask.eventType,
+      dtTask.taskStatus == TaskStatus.done,
     );
   }
 
-  DtLog mapToDtLog(LogEvent logEvent) {
-    final dtLog = DtLog();
-    dtLog.logKey = logEvent.id;
-    dtLog.color = logEvent.eventType == EventType.red ? 'red' : 'black';
-    dtLog.dateTime = logEvent.dateTime;
-    // dtLog.dateTime = logEvent.tryTimes.isEmpty ? DateTime.now() : logEvent.tryTimes[0];
-    // dtLog.retryCount = logEvent.retry;
-    dtLog.hasFinished = logEvent.isSuccess;
-    return dtLog;
+  DtTask mapToDtLog(LogEvent logEvent) {
+    return DtTask(
+      taskKey: logEvent.id,
+      dateTime: logEvent.dateTime,
+      eventType: logEvent.eventType,
+      taskStatus: logEvent.isSuccess ? TaskStatus.done : TaskStatus.open,
+    );
   }
 }

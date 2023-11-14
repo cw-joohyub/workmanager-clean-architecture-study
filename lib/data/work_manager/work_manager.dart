@@ -6,6 +6,7 @@ import 'package:workmanager_clean_architecture_sample/presentation/cubit/work_ma
 
 import '../../di/di.dart';
 import '../local_csv/csv_log_local_datasource.dart';
+import '../local_isar/dt_task.dart';
 import '../local_isar/log_local_datasource.dart';
 import '../remote/number_remote_datasource.dart';
 

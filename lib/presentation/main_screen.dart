@@ -10,6 +10,7 @@ import 'package:workmanager_clean_architecture_sample/presentation/widget/event_
 import 'package:workmanager_clean_architecture_sample/presentation/widget/option_panel.dart';
 import 'package:workmanager_clean_architecture_sample/presentation/widget/remain_event_log_panel.dart';
 
+import '../data/local_isar/dt_task.dart';
 import '../util/gaps.dart';
 import 'widget/counter_panel.dart';
 import 'widget/success_rate_plot.dart';
@@ -64,11 +65,11 @@ class MainScreen extends StatelessWidget {
     final WorkManagerCubit cubit = context.read<WorkManagerCubit>();
     return GFButton(
       onPressed: () {
-        cubit.plusOneNumber(type.name);
+        cubit.plusOneNumber(type);
       },
       onLongPress: () async {
         for (int i = 0; i < 50; i++) {
-          cubit.plusOneNumber(type.name);
+          cubit.plusOneNumber(type);
         }
       },
       color: type == EventType.red ? Colors.red : Colors.black,
