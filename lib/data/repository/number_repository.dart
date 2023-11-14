@@ -2,7 +2,10 @@ import 'package:injectable/injectable.dart';
 import 'package:uuid/uuid.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:workmanager_clean_architecture_sample/data/local_isar/dt_log.dart';
+import 'package:workmanager_clean_architecture_sample/data/local_isar/dt_task.dart';
 import 'package:workmanager_clean_architecture_sample/data/mapper/log_event_mapper.dart';
+import 'package:workmanager_clean_architecture_sample/data/util/task_requester.dart';
+import 'package:workmanager_clean_architecture_sample/data/util/work_manager_constraint.dart';
 import 'package:workmanager_clean_architecture_sample/presentation/cubit/work_manager_cubit.dart';
 
 import '../../di/di.dart';
@@ -23,14 +26,15 @@ class NumberRepository {
   final LogLocalDatasource _logLocalDatasource;
 
   static void setOption(
-      {int? successRate, int? fakeDelayMilliseconds, bool? isImprovedAppend, bool? isPeriodicTask}) {
+      {int? successRate,
+      int? fakeDelayMilliseconds,
+      bool? isImprovedAppend,
+      bool? isPeriodicTask}) {
     NumberRepository.successRate = successRate ?? NumberRepository.successRate;
     NumberRepository.fakeDelayMilliseconds =
         fakeDelayMilliseconds ?? NumberRepository.fakeDelayMilliseconds;
-    NumberRepository.isImprovedAppend =
-        isImprovedAppend ?? NumberRepository.isImprovedAppend;
-    NumberRepository.isPeriodicTask =
-        isPeriodicTask ?? NumberRepository.isPeriodicTask;
+    NumberRepository.isImprovedAppend = isImprovedAppend ?? NumberRepository.isImprovedAppend;
+    NumberRepository.isPeriodicTask = isPeriodicTask ?? NumberRepository.isPeriodicTask;
   }
 
   Future<int> getNumber(String color) async {
@@ -43,8 +47,7 @@ class NumberRepository {
     return _numberLocalDatasource.watchChange(color);
   }
 
-  Future<Stream<void>?> watchLogChanged() =>
-      _logLocalDatasource.watchLogChanged();
+  Future<Stream<void>?> watchLogChanged() => _logLocalDatasource.watchLogChanged();
 
   Future<List<LogEvent>> getAllLog() async {
     List<DtLog>? dtLogList = await _logLocalDatasource.getAllLog();
@@ -53,38 +56,18 @@ class NumberRepository {
       return [];
     }
 
-    List<LogEvent> result = dtLogList
-        .map((DtLog log) => LogEventMapper().mapToLogEvent(log))
-        .toList();
+    List<LogEvent> result =
+        dtLogList.map((DtLog log) => LogEventMapper().mapToLogEvent(log)).toList();
 
     return result;
   }
 
   Future<int> getLastNumber(String color) async {
     return await _logLocalDatasource.getAllCount(color);
-
-    // return await _numberLocalDatasource.getNumber(color);
   }
 
   Future<void> postPlusOne(String color) async {
-    final String taskKey =
-        color == 'red' ? plusOneToRedTaskKey : plusOneToBlackTaskKey;
-    // final int logKey = await _logLocalDatasource.addLog(color);
-
-    // print('postPlusOne : $color, $logKey');
-
-    //Work Unique keys
-    // Workmanager().registerOneOffTask('$taskKey$logKey', taskKey,
-    //     inputData: <String, dynamic>{
-    //       'logKey': logKey,
-    //     },
-    //     // constraints: Constraints(networkType: NetworkType.connected),
-    //     backoffPolicy: BackoffPolicy.linear,
-    //     backoffPolicyDelay: const Duration(milliseconds: 500),
-    //     initialDelay: const Duration(milliseconds: 100),
-    //     existingWorkPolicy: ExistingWorkPolicy.append,
-    //     outOfQuotaPolicy: OutOfQuotaPolicy.run_as_non_expedited_work_request,);
-
+    final String taskKey = color == 'red' ? plusOneToRedTaskKey : plusOneToBlackTaskKey;
     // Work Unique keys
 
     String logKey = const Uuid().v4();
@@ -112,26 +95,18 @@ class NumberRepository {
         existingWorkPolicy: ExistingWorkPolicy.append,
         // outOfQuotaPolicy: OutOfQuotaPolicy.run_as_non_expedited_work_request,
       );
-    }else {
-
-      Workmanager().registerOneOffTask(
-        iosTest,
-        iosTest,
-        inputData: <String, dynamic>{
-          'color': color,
-          'taskKey': taskKey,
-          'logKey': logKey,
-          'successRate': successRate,
-          'fakeDelayMilliseconds': fakeDelayMilliseconds,
-          'isImprovedAppend': isImprovedAppend,
-          'isPeriodicTask': isPeriodicTask,
-        },
-        // constraints: Constraints(networkType: NetworkType.connected),
-        backoffPolicy: BackoffPolicy.linear,
-        backoffPolicyDelay: const Duration(milliseconds: 500),
-        initialDelay: const Duration(milliseconds: 100),
-        existingWorkPolicy: ExistingWorkPolicy.append,
-        // outOfQuotaPolicy: OutOfQuotaPolicy.run_as_non_expedited_work_request,
+    } else {
+      TaskRequester().registerWorkManager(
+        color,
+        TaskStatus.open,
+        null,
+        WorkManagerConstraint(
+            initialDelay: null, restartDuration: null, isNetworkCheck: null, retryCount: null),
+        // WorkManagerConstraint(
+        //     initialDelay: const Duration(seconds: 12),
+        //     restartDuration: const Duration(seconds: 12),
+        //     isNetworkCheck: true,
+        //     retryCount: 10),
       );
     }
   }

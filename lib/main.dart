@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
+
 import 'package:workmanager_clean_architecture_sample/presentation/main_screen.dart';
 
-import 'data/work_manager/work_manager.dart';
+import 'data/util/callback_dispatcher.dart';
+
 import 'di/di.dart';
 
 void main() {
   getItInit();
   WidgetsFlutterBinding.ensureInitialized();
-  Workmanager().initialize(
-      callbackDispatcher, // The top level function, aka callbackDispatcher
+  Workmanager().initialize(callbackDispatcher, // The top level function, aka callbackDispatcher
       isInDebugMode:
-      true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
-  );
+          true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+      );
   runApp(const MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -169,4 +169,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }*/
-
