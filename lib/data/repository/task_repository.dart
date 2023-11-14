@@ -46,7 +46,7 @@ class TaskRepository {
   }
 
   Future<void> postPlusOne(EventType color) async {
-    _ctWorkManager.addTask(color);
+    await _ctWorkManager.addTask(color);
     await TaskRequester().registerWorkManager(WorkManagerConstraint(
       initialDelay: null,
       restartDuration: null,

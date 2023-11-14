@@ -61,8 +61,6 @@ void callbackDispatcher() {
         final int retryCount = constraint.retryCount!;
         int currentCount = await getIt<IsarTaskDatasource>().getTaskRetryCount(pollTask.taskKey);
 
-        print('tes $retryCount , $currentCount');
-
         await Future<void>.delayed(constraint.initialDelay!);
         final apiResult = await postNumberCount(taskKey);
 
