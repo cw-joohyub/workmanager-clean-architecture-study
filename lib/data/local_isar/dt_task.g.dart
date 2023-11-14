@@ -131,12 +131,14 @@ const _DtTasktaskStatusEnumValueMap = {
   'inProgress': 1,
   'done': 2,
   'canceled': 3,
+  'failed': 4,
 };
 const _DtTasktaskStatusValueEnumMap = {
   0: TaskStatus.open,
   1: TaskStatus.inProgress,
   2: TaskStatus.done,
   3: TaskStatus.canceled,
+  4: TaskStatus.failed,
 };
 
 Id _dtTaskGetId(DtTask object) {

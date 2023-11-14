@@ -18,6 +18,8 @@ abstract class IsarTaskDatasource {
 
   Future<int> addTask(EventType type, {Map<String, dynamic>? data});
 
+  Future<int> addOpenedTask(DtTask task);
+
   Stream<List<DtTask>> getTaskList();
 
   Future<void> deleteAllTask();
@@ -43,10 +45,7 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
     await initDb();
 
     DtTask? task = isar?.writeTxnSync(() {
-      return isar?.dtTasks
-          .filter()
-          .taskStatusEqualTo(TaskStatus.open)
-          .findFirstSync();
+      return isar?.dtTasks.filter().taskStatusEqualTo(TaskStatus.open).findFirstSync();
     });
     if (task != null) {
       task.taskStatus = TaskStatus.inProgress;
@@ -61,12 +60,7 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
   Future<bool> isTaskExists() async {
     await initDb();
 
-    return isar?.dtTasks
-            .where()
-            .filter()
-            .taskStatusEqualTo(TaskStatus.open)
-            .countSync() !=
-        0;
+    return isar?.dtTasks.where().filter().taskStatusEqualTo(TaskStatus.open).countSync() != 0;
   }
 
   @override
@@ -74,13 +68,14 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
     await initDb();
 
     return isar?.txnSync(() =>
-        isar?.dtTasks
-            .where()
-            .filter()
-            .taskKeyEqualTo(taskKey)
-            .taskStatusEqualTo(TaskStatus.failed)
-            .countSync() ??
-        0) ?? 0;
+            isar?.dtTasks
+                .where()
+                .filter()
+                .taskKeyEqualTo(taskKey)
+                .taskStatusEqualTo(TaskStatus.failed)
+                .countSync() ??
+            0) ??
+        0;
   }
 
   @override
@@ -88,11 +83,11 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
     await initDb();
 
     return isar?.writeTxnSync(() {
-          DtTask? task =
-              isar?.dtTasks.filter().taskKeyEqualTo(taskId).findFirstSync();
+          DtTask? task = isar?.dtTasks.filter().taskKeyEqualTo(taskId).findAllSync().last;
           if (task != null) {
             task.dateTime = DateTime.now();
             task.taskStatus = status;
+
             return isar?.dtTasks.putSync(task);
           }
           return 0;
@@ -182,5 +177,22 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
       }
     });
     return;
+  }
+
+  @override
+  Future<int> addOpenedTask(DtTask task) async {
+    await initDb();
+
+    DtTask result = DtTask(
+        taskKey: task.taskKey,
+        eventType: task.eventType,
+        dateTime: DateTime.now(),
+        taskStatus: TaskStatus.open);
+
+    isar?.writeTxnSync(() {
+      return isar?.dtTasks.putSync(result);
+    });
+
+    return 0;
   }
 }
