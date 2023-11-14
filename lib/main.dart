@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
-import 'package:workmanager_clean_architecture_sample/data/work_manager/ct_work_manager.dart';
-
 import 'package:workmanager_clean_architecture_sample/presentation/main_screen.dart';
 
 import 'data/util/callback_dispatcher.dart';
-
 import 'di/di.dart';
 
 void main() async {
@@ -15,7 +12,6 @@ void main() async {
       isInDebugMode:
       true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
   );
-  await getIt<CTWorkManager>().initDb();
   runApp(const MyApp());
 }
 

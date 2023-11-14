@@ -4,7 +4,7 @@ part 'dt_task.g.dart';
 
 enum EventType { red, black }
 
-enum TaskStatus { open, inProgress, done, canceled }
+enum TaskStatus { open, inProgress, done, canceled, failed }
 
 extension TaskStatusExtension on TaskStatus {
   String taskStatusToString() {
@@ -17,6 +17,8 @@ extension TaskStatusExtension on TaskStatus {
         return 'done';
       case TaskStatus.canceled:
         return 'canceled';
+      case TaskStatus.failed:
+        return 'failed';
       default:
         throw ArgumentError('Invalid TaskStatus value: $this');
     }
@@ -34,6 +36,8 @@ extension StringTaskStatusExtension on String {
         return TaskStatus.done;
       case 'canceled':
         return TaskStatus.canceled;
+      case 'failed':
+        return TaskStatus.failed;
       default:
         throw ArgumentError('Invalid TaskStatus string: $this');
     }

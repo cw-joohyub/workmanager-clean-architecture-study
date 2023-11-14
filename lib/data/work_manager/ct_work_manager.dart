@@ -8,7 +8,7 @@ class CTWorkManager {
 
   final IsarTaskDatasource _isarTaskDatasource;
 
-  int addTask(EventType type, {Map<String, dynamic>? data}) {
+  Future<int> addTask(EventType type, {Map<String, dynamic>? data}) {
     return _isarTaskDatasource.addTask(type, data: data);
   }
 
@@ -20,11 +20,11 @@ class CTWorkManager {
     _isarTaskDatasource.deleteAllTask();
   }
 
-  int cancelTask(String taskKey, EventType eventType) {
+  Future<int> cancelTask(String taskKey, EventType eventType) {
     return _isarTaskDatasource.cancelTask(taskKey, eventType);
   }
 
-  DateTime? getLastTaskTime() {
+  Future<DateTime?> getLastTaskTime() {
     return _isarTaskDatasource.getLastTaskTime();
   }
 

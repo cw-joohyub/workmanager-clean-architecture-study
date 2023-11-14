@@ -7,14 +7,26 @@ import 'dt_task.dart';
 
 abstract class IsarTaskDatasource {
   Future<void> initDb();
-  DtTask? pollTask();
-  int writeTaskResult(String taskId, TaskStatus status);
-  int addTask(EventType type, {Map<String, dynamic>? data});
+
+  Future<DtTask?> pollTask();
+
+  Future<bool> isTaskExists();
+
+  Future<int> getTaskRetryCount(String taskKey);
+
+  Future<int> writeTaskResult(String taskId, TaskStatus status);
+
+  Future<int> addTask(EventType type, {Map<String, dynamic>? data});
+
   Stream<List<DtTask>> getTaskList();
-  void deleteAllTask();
-  int cancelTask(String taskKey, EventType eventType);
-  DateTime? getLastTaskTime();
-  void checkActiveTasks();
+
+  Future<void> deleteAllTask();
+
+  Future<int> cancelTask(String taskKey, EventType eventType);
+
+  Future<DateTime?> getLastTaskTime();
+
+  Future<void> checkActiveTasks();
 }
 
 @LazySingleton(as: IsarTaskDatasource)
@@ -27,11 +39,14 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
   }
 
   @override
-  DtTask? pollTask() {
-    initDb();
+  Future<DtTask?> pollTask() async {
+    await initDb();
 
     DtTask? task = isar?.writeTxnSync(() {
-      return isar?.dtTasks.filter().taskStatusEqualTo(TaskStatus.open).findFirstSync();
+      return isar?.dtTasks
+          .filter()
+          .taskStatusEqualTo(TaskStatus.open)
+          .findFirstSync();
     });
     if (task != null) {
       task.taskStatus = TaskStatus.inProgress;
@@ -43,23 +58,51 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
   }
 
   @override
-  int writeTaskResult(String taskId, TaskStatus status) {
-    initDb();
+  Future<bool> isTaskExists() async {
+    await initDb();
 
-    return isar?.writeTxnSync(() {
-      DtTask? task = isar?.dtTasks.filter().taskKeyEqualTo(taskId).findFirstSync();
-      if (task != null) {
-        task.dateTime = DateTime.now();
-        task.taskStatus = status;
-        return isar?.dtTasks.putSync(task);
-      }
-      return 0;
-    }) ?? 0;
+    return isar?.dtTasks
+            .where()
+            .filter()
+            .taskStatusEqualTo(TaskStatus.open)
+            .countSync() !=
+        0;
   }
 
   @override
-  int addTask(EventType type, {Map<String, dynamic>? data}) {
-    initDb();
+  Future<int> getTaskRetryCount(String taskKey) async {
+    await initDb();
+
+    return isar?.txnSync(() =>
+        isar?.dtTasks
+            .where()
+            .filter()
+            .taskKeyEqualTo(taskKey)
+            .taskStatusEqualTo(TaskStatus.failed)
+            .countSync() ??
+        0) ?? 0;
+  }
+
+  @override
+  Future<int> writeTaskResult(String taskId, TaskStatus status) async {
+    await initDb();
+
+    return isar?.writeTxnSync(() {
+          DtTask? task =
+              isar?.dtTasks.filter().taskKeyEqualTo(taskId).findFirstSync();
+          if (task != null) {
+            task.dateTime = DateTime.now();
+            task.taskStatus = status;
+            return isar?.dtTasks.putSync(task);
+          }
+          return 0;
+        }) ??
+        0;
+  }
+
+  @override
+  Future<int> addTask(EventType type, {Map<String, dynamic>? data}) async {
+    await initDb();
 
     DtTask task = DtTask(
       taskKey: const Uuid().v4(),
@@ -74,17 +117,17 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
   }
 
   @override
-  Stream<List<DtTask>> getTaskList() {
-    initDb();
+  Stream<List<DtTask>> getTaskList() async* {
+    await initDb();
 
-    return isar?.dtTasks.watchLazy().asyncMap((_) async {
+    yield* isar?.dtTasks.watchLazy().asyncMap((_) async {
           return await isar?.dtTasks.where().findAll() ?? [];
         }) ??
         const Stream.empty();
   }
 
   @override
-  void deleteAllTask() {
+  Future<void> deleteAllTask() async {
     initDb();
 
     isar?.writeTxnSync(() {
@@ -93,7 +136,7 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
   }
 
   @override
-  int cancelTask(String taskKey, EventType eventType) {
+  Future<int> cancelTask(String taskKey, EventType eventType) async {
     initDb();
 
     return isar?.writeTxnSync(() {
@@ -110,15 +153,15 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
   }
 
   @override
-  DateTime? getLastTaskTime() {
+  Future<DateTime?> getLastTaskTime() async {
     initDb();
 
     return isar?.dtTasks.where().sortByDateTime().findFirstSync()?.dateTime;
   }
 
   @override
-  void checkActiveTasks() {
-    initDb();
+  Future<void> checkActiveTasks() async {
+    await initDb();
 
     // 같은 task id 로 group by 하고, 가장 최근의 TaskStatus 가 inProgress 인 것을 찾는다.
     isar?.dtTasks
