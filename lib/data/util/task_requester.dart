@@ -22,8 +22,9 @@ class TaskRequester {
   static bool isImprovedAppend = false;
   static bool isPeriodicTask = false;
 
-  Future<void> registerWorkManager({WorkManagerConstraint? workManagerConstraint}) async {
-    await Workmanager().registerOneOffTask('red', 'red',
+  Future<void> registerWorkManager(
+      {required String taskId, WorkManagerConstraint? workManagerConstraint}) async {
+    await Workmanager().registerOneOffTask(taskId, taskId,
         inputData: <String, dynamic>{
           'constraint': workManagerConstraint?.toJsonString() ?? '',
         },

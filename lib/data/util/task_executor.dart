@@ -1,4 +1,3 @@
-import 'package:workmanager/workmanager.dart';
 import 'package:workmanager_clean_architecture_sample/data/local_isar/dt_task.dart';
 import 'package:workmanager_clean_architecture_sample/data/util/task_requester.dart';
 import 'package:workmanager_clean_architecture_sample/data/util/work_manager_constraint.dart';
@@ -12,7 +11,7 @@ class TaskExecutor {
 
   TaskExecutor(this._remoteDatasource);
 
-  Future<bool> postNumberCount(EventType eventType) async {
+  Future<bool> postNumberCount() async {
     final isSuccess = await _remoteDatasource.postAddEvent(10, 0);
     // Add your logging logic here if needed
     return isSuccess;
@@ -32,19 +31,11 @@ class TaskExecutor {
       return;
     }
 
-    final String taskKeyString = pollTask.taskKey;
-    final EventType taskKey = taskKeyString == 'red' ? EventType.red : EventType.black;
-
-    switch (taskKey) {
-      case EventType.red:
-      case EventType.black:
-        await processTask(taskKey, inputData, pollTask);
-        break;
-    }
+    await processTask(task, inputData, pollTask);
   }
 
   Future<void> processTask(
-    EventType taskKey,
+    String task,
     Map<String, dynamic>? inputData,
     DtTask pollTask,
   ) async {
@@ -68,42 +59,44 @@ class TaskExecutor {
       await Future<void>.delayed(constraint.initialDelay!);
     }
 
-    final apiResult = await postNumberCount(taskKey);
+    final apiResult = await postNumberCount();
 
     if (!apiResult) {
       if (currentCount < retryCount - 1) {
-        await handleRetry(pollTask, constraint);
+        await handleRetry(task, pollTask, constraint);
       } else {
-        await handleTaskFailure(pollTask, constraint);
+        await handleTaskFailure(task, pollTask, constraint);
       }
     } else {
-      await handleTaskSuccess(pollTask, constraint);
+      await handleTaskSuccess(task, pollTask, constraint);
     }
   }
 
-  Future<void> handleRetry(DtTask pollTask, WorkManagerConstraint constraint) async {
+  Future<void> handleRetry(String task, DtTask pollTask, WorkManagerConstraint constraint) async {
     await getIt<IsarTaskDatasource>().writeTaskResult(pollTask.taskKey, TaskStatus.failed);
     await getIt<IsarTaskDatasource>().addOpenedTask(pollTask);
 
     await Future<void>.delayed(constraint.restartDuration!);
-    await TaskRequester().registerWorkManager(workManagerConstraint: constraint);
+    await TaskRequester().registerWorkManager(taskId: task, workManagerConstraint: constraint);
   }
 
-  Future<void> handleTaskFailure(DtTask pollTask, WorkManagerConstraint constraint) async {
+  Future<void> handleTaskFailure(
+      String task, DtTask pollTask, WorkManagerConstraint constraint) async {
     await getIt<IsarTaskDatasource>().writeTaskResult(pollTask.taskKey, TaskStatus.failed);
 
     final bool isResultExist = await getIt<IsarTaskDatasource>().isTaskExists();
     if (isResultExist) {
-      await TaskRequester().registerWorkManager(workManagerConstraint: constraint);
+      await TaskRequester().registerWorkManager(taskId: task, workManagerConstraint: constraint);
     }
   }
 
-  Future<void> handleTaskSuccess(DtTask pollTask, WorkManagerConstraint constraint) async {
+  Future<void> handleTaskSuccess(
+      String task, DtTask pollTask, WorkManagerConstraint constraint) async {
     await getIt<IsarTaskDatasource>().writeTaskResult(pollTask.taskKey, TaskStatus.done);
 
     final bool isResultExist = await getIt<IsarTaskDatasource>().isTaskExists();
     if (isResultExist) {
-      await TaskRequester().registerWorkManager(workManagerConstraint: constraint);
+      await TaskRequester().registerWorkManager(taskId: task, workManagerConstraint: constraint);
     }
   }
 }
