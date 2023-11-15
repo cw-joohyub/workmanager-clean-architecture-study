@@ -75,7 +75,11 @@ extension on List<DtTask> {
   Map<String, List<LogEvent>> toLogEvents() {
     Map<String, List<LogEvent>> logEvents = {};
     map((e) => LogEventMapper().mapToLogEvent(e)).toList().forEach((element) {
-      logEvents[element.id] = [element];
+      if (logEvents[element.id] == null) {
+        logEvents[element.id] = [element];
+      } else {
+        logEvents[element.id]!.add(element);
+      }
     });
     return logEvents;
   }
