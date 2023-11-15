@@ -24,19 +24,9 @@ class TaskRequester {
   static bool isImprovedAppend = false;
   static bool isPeriodicTask = false;
 
-  void registerWorkManager(String color, TaskStatus taskStatus, int? retryCount,
-      WorkManagerConstraint workManagerConstraint) async {
-    String logKey = const Uuid().v4();
-
-    if (retryCount != null && retryCount == 0) {
-      await Future<void>.delayed(workManagerConstraint.initialDelay!);
-    }
-    Workmanager().registerOneOffTask(color, color,
+  Future<void> registerWorkManager(WorkManagerConstraint workManagerConstraint) async {
+    await Workmanager().registerOneOffTask('red', 'red',
         inputData: <String, dynamic>{
-          'taskKey': color,
-          'logKey': logKey,
-          'taskStatus': taskStatus.taskStatusToString(),
-          'retryCount': retryCount ?? 0,
           'constraint': workManagerConstraint.toJsonString() ?? '',
         },
         existingWorkPolicy: ExistingWorkPolicy.replace);
