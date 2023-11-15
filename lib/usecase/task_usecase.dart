@@ -7,11 +7,12 @@ import '../data/repository/task_repository.dart';
 
 abstract class TaskUseCase {
 
-  Stream<List<DtTask>> watchLogChanged();
+  Stream<List<DtTask>> getTaskListStream();
+
+  Future<List<DtTask>?> getTaskList();
 
   Future<void> plusOneNumber(EventType color);
 
-  Future<int> getTaskCount(EventType color);
 }
 
 @Injectable(as: TaskUseCase)
@@ -27,12 +28,11 @@ class TaskUseCaseImpl extends TaskUseCase {
   }
 
   @override
-  Stream<List<DtTask>> watchLogChanged() => _taskRepository.watchTaskChange();
-
+  Stream<List<DtTask>> getTaskListStream() => _taskRepository.getTaskListStream();
 
   @override
-  Future<int> getTaskCount(EventType color) async {
-    return await _taskRepository.getWorkCount(color);
+  Future<List<DtTask>?> getTaskList() {
+    return _taskRepository.getTaskList();
   }
 
 }

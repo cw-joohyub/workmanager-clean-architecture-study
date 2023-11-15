@@ -12,7 +12,11 @@ class CTWorkManager {
     return _isarTaskDatasource.addTask(type, data: data);
   }
 
-  Stream<List<DtTask>> getTaskList() {
+  Stream<List<DtTask>> getTaskListStream() {
+    return _isarTaskDatasource.getTaskListStream();
+  }
+
+  Future<List<DtTask>?> getTaskList() {
     return _isarTaskDatasource.getTaskList();
   }
 

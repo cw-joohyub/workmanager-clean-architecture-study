@@ -27,21 +27,12 @@ class TaskRepository {
         isPeriodicTask ?? TaskRepository.isPeriodicTask;
   }
 
-  Stream<List<DtTask>> watchTaskChange() {
-    return _ctWorkManager.getTaskList();
+  Stream<List<DtTask>> getTaskListStream() {
+    return _ctWorkManager.getTaskListStream();
   }
 
-  Future<int> getWorkCount(EventType color) async {
-    await for (List<DtTask> taskList in watchTaskChange()) {
-      int count = 0;
-      for (var element in taskList) {
-        if (element.eventType == color && element.taskStatus == TaskStatus.done) {
-          count++;
-        }
-      }
-      return count;
-    }
-    return 0;
+  Future<List<DtTask>?> getTaskList() {
+    return _ctWorkManager.getTaskList();
   }
 
   Future<void> postPlusOne(EventType color) async {

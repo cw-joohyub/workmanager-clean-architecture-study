@@ -48,17 +48,19 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
       : super(WorkManagerState(blackCount: 0, redCount: 0, logEvents: {}));
 
   Future<void> init() async {
-    final logStream = _taskUseCase.watchLogChanged();
+    List<DtTask> taskList = await _taskUseCase.getTaskList() ?? [];
+    emit(state.copyWith(
+        redCount: taskList.getDoneTaskCount(EventType.red),
+        blackCount: taskList.getDoneTaskCount(EventType.black),
+        logEvents: taskList.toLogEvents()));
+
+    final logStream = _taskUseCase.getTaskListStream();
 
     logStream.listen((List<DtTask> taskList) async {
-      int redCount = await _taskUseCase.getTaskCount(EventType.red);
-      int blackCount = await _taskUseCase.getTaskCount(EventType.black);
+      int redCount = taskList.getDoneTaskCount(EventType.red);
+      int blackCount = taskList.getDoneTaskCount(EventType.black);
 
-      Map<String, List<LogEvent>>? logEvents = {};
-      taskList.map((e) => LogEventMapper().mapToLogEvent(e)).toList().forEach((element) {
-        logEvents[element.id] = [element];
-      });
-
+      Map<String, List<LogEvent>>? logEvents = taskList.toLogEvents();
       emit(state.copyWith(
           redCount: redCount, blackCount: blackCount, logEvents: logEvents));
     });
@@ -67,5 +69,20 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
   Future<void> plusOneNumber(EventType color) async {
     await _taskUseCase.plusOneNumber(color);
   }
+}
 
+extension on List<DtTask> {
+  Map<String, List<LogEvent>> toLogEvents() {
+    Map<String, List<LogEvent>> logEvents = {};
+    map((e) => LogEventMapper().mapToLogEvent(e)).toList().forEach((element) {
+      logEvents[element.id] = [element];
+    });
+    return logEvents;
+  }
+
+  int getDoneTaskCount(EventType eventType) {
+    return where((DtTask task) =>
+            task.eventType == eventType && task.taskStatus == TaskStatus.done)
+        .length;
+  }
 }

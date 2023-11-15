@@ -18,7 +18,9 @@ abstract class IsarTaskDatasource {
 
   Future<int> addTask(EventType type, {Map<String, dynamic>? data});
 
-  Stream<List<DtTask>> getTaskList();
+  Future<List<DtTask>?> getTaskList();
+
+  Stream<List<DtTask>> getTaskListStream();
 
   Future<void> deleteAllTask();
 
@@ -117,7 +119,14 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
   }
 
   @override
-  Stream<List<DtTask>> getTaskList() async* {
+  Future<List<DtTask>?> getTaskList() async {
+    await initDb();
+
+    return isar?.dtTasks.where().findAll();
+  }
+
+  @override
+  Stream<List<DtTask>> getTaskListStream() async* {
     await initDb();
 
     yield* isar?.dtTasks.watchLazy().asyncMap((_) async {
