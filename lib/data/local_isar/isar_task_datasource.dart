@@ -31,6 +31,8 @@ abstract class IsarTaskDatasource {
   Future<DateTime?> getLastTaskTime();
 
   Future<void> checkActiveTasks();
+
+  Future<List<DtTask>> testCode();
 }
 
 @LazySingleton(as: IsarTaskDatasource)
@@ -49,6 +51,7 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
     DtTask? task = isar?.writeTxnSync(() {
       return isar?.dtTasks.filter().taskStatusEqualTo(TaskStatus.open).findFirstSync();
     });
+
     if (task != null) {
       task.taskStatus = TaskStatus.inProgress;
       isar?.writeTxnSync(() {
@@ -70,13 +73,14 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
     await initDb();
 
     return isar?.txnSync(() =>
-        isar?.dtTasks
-            .where()
-            .filter()
-            .taskKeyEqualTo(taskKey)
-            .taskStatusEqualTo(TaskStatus.failed)
-            .countSync() ??
-        0) ?? 0;
+            isar?.dtTasks
+                .where()
+                .filter()
+                .taskKeyEqualTo(taskKey)
+                .taskStatusEqualTo(TaskStatus.failed)
+                .countSync() ??
+            0) ??
+        0;
   }
 
   @override
@@ -202,5 +206,31 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
     });
 
     return 0;
+  }
+
+  @override
+  Future<List<DtTask>> testCode() async {
+    await initDb();
+
+    List<DtTask>? result = await isar?.dtTasks.where().distinctByTaskKey().findAll();
+
+    print('result - $result');
+
+    // await isar?.dtTasks.buildQuery(
+    //   whereClauses: [
+    //     // WhereClause(),
+    //   ],
+    //   filter: FilterGroup.and(
+    //     [
+    //       FilterCondition(
+    //           type: FilterConditionType.contains,
+    //           property: 'property',
+    //           caseSensitive: false,
+    //           include1: true,
+    //           include2: true),
+    //     ],
+    //   ),
+    // );
+    return [];
   }
 }

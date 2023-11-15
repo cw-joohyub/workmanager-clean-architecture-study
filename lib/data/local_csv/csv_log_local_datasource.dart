@@ -10,7 +10,7 @@ class CsvLogLocalDataSource {
 
   static const String filePath = 'log.csv';
 
-  CsvLogLocalDataSource();
+  // CsvLogLocalDataSource();
 
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
