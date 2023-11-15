@@ -31,7 +31,6 @@ abstract class IsarTaskDatasource {
   Future<DateTime?> getLastTaskTime();
 
   Future<void> checkActiveTasks();
-
 }
 
 @LazySingleton(as: IsarTaskDatasource)
@@ -75,7 +74,7 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
             isar?.dtTasks
                 .where()
                 .filter()
-                .taskIdEqualTo(taskId)
+                .taskTypeEqualTo(taskId)
                 .taskStatusEqualTo(TaskStatus.failed)
                 .countSync() ??
             0) ??
@@ -200,5 +199,4 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
 
     return 0;
   }
-
 }
