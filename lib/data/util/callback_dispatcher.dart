@@ -61,26 +61,34 @@ void callbackDispatcher() {
         final int retryCount = constraint.retryCount!;
         int currentCount = await getIt<IsarTaskDatasource>().getTaskRetryCount(pollTask.taskKey);
 
-        await Future<void>.delayed(constraint.initialDelay!);
+        if (currentCount == 0) {
+          await Future<void>.delayed(constraint.initialDelay!);
+        }
+
         final apiResult = await postNumberCount(taskKey);
 
         if (!apiResult) {
-          if (currentCount < retryCount) {
+          if (currentCount < retryCount - 1) {
             await getIt<IsarTaskDatasource>().writeTaskResult(pollTask.taskKey, TaskStatus.failed);
             await getIt<IsarTaskDatasource>().addOpenedTask(pollTask);
 
             await Future<void>.delayed(constraint.restartDuration!);
-            await TaskRequester().registerWorkManager(constraint);
+            await TaskRequester().registerWorkManager(workManagerConstraint: constraint);
           } else {
             await getIt<IsarTaskDatasource>().writeTaskResult(pollTask.taskKey, TaskStatus.failed);
+
             final bool isResultExist = await getIt<IsarTaskDatasource>().isTaskExists();
-            if (isResultExist) await TaskRequester().registerWorkManager(constraint);
+            if (isResultExist) {
+              await TaskRequester().registerWorkManager(workManagerConstraint: constraint);
+            }
           }
         } else {
           await getIt<IsarTaskDatasource>().writeTaskResult(pollTask.taskKey, TaskStatus.done);
 
           final bool isResultExist = await getIt<IsarTaskDatasource>().isTaskExists();
-          if (isResultExist) await TaskRequester().registerWorkManager(constraint);
+          if (isResultExist) {
+            await TaskRequester().registerWorkManager(workManagerConstraint: constraint);
+          }
         }
     }
 
