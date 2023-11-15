@@ -4,6 +4,7 @@ import 'package:glass_kit/glass_kit.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../../data/local_isar/dt_task.dart';
 import '../cubit/work_manager_cubit.dart';
 import 'log_list_tile.dart';
 
@@ -52,13 +53,13 @@ class RemainEventLogPanel extends StatelessWidget {
             height: 280,
             child: ListView(
               children: state.logEvents.values
-                  .where((List<LogEvent> e) => !e.last.isSuccess)
+                  .where((List<LogEvent> e) => e.last.status != TaskStatus.done)
                   .map((List<LogEvent> e) {
                 return LogListTile(
                     datetime: e.first.dateTime,
-                    retry: e.where((LogEvent e) => !e.isSuccess).length-1,
+                    retry: e.where((LogEvent e) => e.status == TaskStatus.failed).length,
                     eventType: e.first.eventType,
-                    isSuccess: e.last.isSuccess);
+                    isSuccess: e.last.status == TaskStatus.done);
               }).toList(),
             ),
           ),

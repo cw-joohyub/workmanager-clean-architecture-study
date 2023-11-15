@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:glass_kit/glass_kit.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:workmanager_clean_architecture_sample/data/local_isar/dt_task.dart';
 
 import '../cubit/work_manager_cubit.dart';
 import 'log_list_tile.dart';
@@ -53,10 +54,10 @@ class EventLogPanel extends StatelessWidget {
               children: state.logEvents.values.map((List<LogEvent> e) {
                 return LogListTile(
                     datetime: e.first.dateTime,
-                    retry: e.where((LogEvent e) => !e.isSuccess).length-1,
+                    retry: e.where((LogEvent e) => e.status == TaskStatus.failed).length,
                     eventType: e.first.eventType,
-                    isSuccess: e.last.isSuccess,
-                    isInvalid: e.where((LogEvent e) => e.isSuccess).length > 1,);
+                    isSuccess: e.last.status == TaskStatus.done,
+                    isInvalid: e.where((LogEvent e) => e.status == TaskStatus.done).length > 1,);
               }).toList(),
             ),
           ),

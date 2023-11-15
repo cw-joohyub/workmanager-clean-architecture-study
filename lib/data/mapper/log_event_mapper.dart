@@ -10,7 +10,7 @@ class LogEventMapper {
       // dtLog.retryCount ?? 0,
       dtTask.dateTime ?? DateTime.now(),
       dtTask.eventType = dtTask.eventType,
-      dtTask.taskStatus == TaskStatus.done,
+      dtTask.taskStatus,
     );
   }
 
@@ -19,7 +19,7 @@ class LogEventMapper {
       taskKey: logEvent.id,
       dateTime: logEvent.dateTime,
       eventType: logEvent.eventType,
-      taskStatus: logEvent.isSuccess ? TaskStatus.done : TaskStatus.open,
+      taskStatus: logEvent.status,
     );
   }
 }

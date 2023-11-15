@@ -11,9 +11,9 @@ class LogEvent {
   String id;
   DateTime dateTime;
   EventType eventType;
-  bool isSuccess;
+  TaskStatus status;
 
-  LogEvent(this.id, this.dateTime, this.eventType, this.isSuccess);
+  LogEvent(this.id, this.dateTime, this.eventType, this.status);
 }
 
 class WorkManagerState {
