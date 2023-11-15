@@ -2,8 +2,6 @@ import 'package:isar/isar.dart';
 
 part 'dt_task.g.dart';
 
-enum EventType { red, black }
-
 enum TaskStatus { open, inProgress, done, canceled, failed }
 
 extension TaskStatusExtension on TaskStatus {
@@ -47,22 +45,19 @@ extension StringTaskStatusExtension on String {
 @collection
 class DtTask {
   Id id = Isar.autoIncrement;
-  String taskKey;
-  @enumerated
-  EventType eventType;
+  String taskId;
   DateTime dateTime;
   @enumerated
   TaskStatus taskStatus;
 
   DtTask({
-    required this.taskKey,
-    required this.eventType,
+    required this.taskId,
     required this.dateTime,
     required this.taskStatus,
   });
 
   @override
   String toString() {
-    return 'DtTask{id: $id, taskKey: $taskKey, eventType: $eventType, dateTime: $dateTime, taskStatus: $taskStatus}';
+    return 'DtTask{id: $id, taskId: $taskId, dateTime: $dateTime, taskStatus: $taskStatus}';
   }
 }

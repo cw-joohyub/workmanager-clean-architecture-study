@@ -10,10 +10,10 @@ import '../../usecase/task_usecase.dart';
 class LogEvent {
   String id;
   DateTime dateTime;
-  EventType eventType;
+  // EventType eventType;
   TaskStatus status;
 
-  LogEvent(this.id, this.dateTime, this.eventType, this.status);
+  LogEvent(this.id, this.dateTime, this.status);
 }
 
 class WorkManagerState {

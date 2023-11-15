@@ -12,11 +12,11 @@ abstract class IsarTaskDatasource {
 
   Future<bool> isTaskExists();
 
-  Future<int> getTaskRetryCount(String taskKey);
+  Future<int> getTaskRetryCount(String taskId);
 
   Future<int> writeTaskResult(String taskId, TaskStatus status);
 
-  Future<int> addTask(EventType type, {Map<String, dynamic>? data});
+  Future<int> addTask(String taskId, {Map<String, dynamic>? data});
 
   Future<int> addOpenedTask(DtTask task);
 
@@ -26,7 +26,7 @@ abstract class IsarTaskDatasource {
 
   Future<void> deleteAllTask();
 
-  Future<int> cancelTask(String taskKey, EventType eventType);
+  Future<int> cancelTask(String taskId);
 
   Future<DateTime?> getLastTaskTime();
 
@@ -69,14 +69,14 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
   }
 
   @override
-  Future<int> getTaskRetryCount(String taskKey) async {
+  Future<int> getTaskRetryCount(String taskId) async {
     await initDb();
 
     return isar?.txnSync(() =>
             isar?.dtTasks
                 .where()
                 .filter()
-                .taskKeyEqualTo(taskKey)
+                .taskIdEqualTo(taskId)
                 .taskStatusEqualTo(TaskStatus.failed)
                 .countSync() ??
             0) ??
@@ -88,7 +88,7 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
     await initDb();
 
     return isar?.writeTxnSync(() {
-          DtTask? task = isar?.dtTasks.filter().taskKeyEqualTo(taskId).findAllSync().last;
+          DtTask? task = isar?.dtTasks.filter().taskIdEqualTo(taskId).findAllSync().last;
           if (task != null) {
             task.dateTime = DateTime.now();
             task.taskStatus = status;
@@ -101,12 +101,11 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
   }
 
   @override
-  Future<int> addTask(EventType type, {Map<String, dynamic>? data}) async {
+  Future<int> addTask(String taskId, {Map<String, dynamic>? data}) async {
     await initDb();
 
     DtTask task = DtTask(
-      taskKey: const Uuid().v4(),
-      eventType: type,
+      taskId: taskId,
       dateTime: DateTime.now(),
       taskStatus: TaskStatus.open,
     );
@@ -143,13 +142,12 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
   }
 
   @override
-  Future<int> cancelTask(String taskKey, EventType eventType) async {
+  Future<int> cancelTask(String taskId) async {
     initDb();
 
     return isar?.writeTxnSync(() {
           DtTask newTask = DtTask(
-            taskKey: taskKey,
-            eventType: eventType,
+            taskId: taskId,
             dateTime: DateTime.now(),
             taskStatus: TaskStatus.canceled,
           );
@@ -195,11 +193,8 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
   Future<int> addOpenedTask(DtTask task) async {
     await initDb();
 
-    DtTask result = DtTask(
-        taskKey: task.taskKey,
-        eventType: task.eventType,
-        dateTime: DateTime.now(),
-        taskStatus: TaskStatus.open);
+    DtTask result =
+        DtTask(taskId: task.taskId, dateTime: DateTime.now(), taskStatus: TaskStatus.open);
 
     isar?.writeTxnSync(() {
       return isar?.dtTasks.putSync(result);
@@ -212,9 +207,9 @@ class IsarTaskDatasourceImpl extends IsarTaskDatasource {
   Future<List<DtTask>> testCode() async {
     await initDb();
 
-    List<DtTask>? result = await isar?.dtTasks.where().distinctByTaskKey().findAll();
+    // List<DtTask>? result = await isar?.dtTasks.where().distinctBytaskId().findAll();
 
-    print('result - $result');
+    // print('result - $result');
 
     // await isar?.dtTasks.buildQuery(
     //   whereClauses: [

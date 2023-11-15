@@ -1,9 +1,10 @@
 import 'package:injectable/injectable.dart';
+import 'package:workmanager/workmanager.dart';
 import 'package:workmanager_clean_architecture_sample/data/local_isar/dt_task.dart';
-import 'package:workmanager_clean_architecture_sample/data/util/work_manager_constraint.dart';
-import 'package:workmanager_clean_architecture_sample/data/work_manager/ct_work_manager.dart';
+import 'package:workmanager_clean_architecture_sample/data/work_manager/model/work_manager_constraint.dart';
+import 'package:workmanager_clean_architecture_sample/data/work_manager/work_manager_plus.dart';
 
-import '../util/task_requester.dart';
+import '../work_manager/task_requester.dart';
 
 @injectable
 class TaskRepository {
@@ -14,7 +15,7 @@ class TaskRepository {
   static bool isImprovedAppend = false;
   static bool isPeriodicTask = false;
 
-  final CTWorkManager _ctWorkManager;
+  final WorkManagerPlus _ctWorkManager;
 
   static void setOption(
       {int? successRate,
@@ -36,8 +37,15 @@ class TaskRepository {
     return _ctWorkManager.getTaskList();
   }
 
-  Future<void> postPlusOne(EventType color) async {
-    await _ctWorkManager.addTask(color);
-    await TaskRequester().registerWorkManager(taskId: color.name, workManagerConstraint: null);
+  Future<void> postPlusOne(String taskId) async {
+    await _ctWorkManager.addTask(taskId);
+    await _ctWorkManager.registerWorkManager(taskId: taskId);
+      // workManagerConstraint: WorkManagerConstraint(
+      //   initialDelay: null,
+      //   restartDuration: Duration(seconds: 2),
+      //   isNetworkCheck: null,
+      //   retryCount: null,
+      //   backOffPolicy: BackoffPolicy.linear,
+      // ),
   }
 }

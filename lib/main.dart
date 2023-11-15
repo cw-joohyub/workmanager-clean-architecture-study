@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:workmanager_clean_architecture_sample/presentation/main_screen.dart';
 
-import 'data/util/callback_dispatcher.dart';
+import 'data/work_manager/callback_dispatcher.dart';
 import 'di/di.dart';
 
 void main() async {
