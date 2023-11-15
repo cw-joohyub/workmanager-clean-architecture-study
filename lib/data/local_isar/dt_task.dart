@@ -45,19 +45,19 @@ extension StringTaskStatusExtension on String {
 @collection
 class DtTask {
   Id id = Isar.autoIncrement;
-  String taskId;
+  String taskType;
   DateTime dateTime;
   @enumerated
   TaskStatus taskStatus;
 
   DtTask({
-    required this.taskId,
+    required this.taskType,
     required this.dateTime,
     required this.taskStatus,
   });
 
   @override
   String toString() {
-    return 'DtTask{id: $id, taskId: $taskId, dateTime: $dateTime, taskStatus: $taskStatus}';
+    return 'DtTask{id: $id, taskId: $taskType, dateTime: $dateTime, taskStatus: $taskStatus}';
   }
 }

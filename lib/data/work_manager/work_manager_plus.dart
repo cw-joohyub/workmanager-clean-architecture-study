@@ -5,38 +5,29 @@ import 'package:workmanager_clean_architecture_sample/data/work_manager/task_req
 
 import 'model/work_manager_constraint.dart';
 
-@injectable
+@lazySingleton
 class WorkManagerPlus {
-  WorkManagerPlus(this._isarTaskDatasource, this._taskRequester);
+  WorkManagerPlus(this._isarTaskDatasource);
 
   final IsarTaskDatasource _isarTaskDatasource;
-  final TaskRequester _taskRequester;
+  WorkManagerConstraint workManagerConstraint =
+      WorkManagerConstraint.fromDefault();
 
-  Future<void> registerWorkManager(
-      {required String taskId, WorkManagerConstraint? workManagerConstraint}) async {
+  Future<void> notifyWorkManager() async {
+    await checkActiveTasks();
     DateTime? lastDatetime = await getLastTaskTime();
-
-    workManagerConstraint ??= const WorkManagerConstraint(
-      initialDelay: null,
-      restartDuration: null,
-      isNetworkCheck: null,
-      retryCount: null,
-      backOffPolicy: null,
-    );
-
     if (lastDatetime != null &&
-        lastDatetime.difference(DateTime.now()).inSeconds <
+        lastDatetime.difference(DateTime.now()).inSeconds >
             workManagerConstraint.restartDuration!.inSeconds) {
       return;
     }
 
-    await _taskRequester.registerWorkManager(
-        taskId: taskId, workManagerConstraint: workManagerConstraint);
+    await TaskRequester.registerWorkManager();
   }
 
   Future<int> addTask(String taskId, {Map<String, dynamic>? data}) async {
     int result = await _isarTaskDatasource.addTask(taskId, data: data);
-    registerWorkManager(taskId: taskId);
+    await notifyWorkManager();
     return result;
   }
 
@@ -52,15 +43,15 @@ class WorkManagerPlus {
     _isarTaskDatasource.deleteAllTask();
   }
 
-  Future<int> cancelTask(String taskId) {
-    return _isarTaskDatasource.cancelTask(taskId);
+  Future<int> cancelTask(int id) {
+    return _isarTaskDatasource.cancelTask(id);
   }
 
   Future<DateTime?> getLastTaskTime() {
     return _isarTaskDatasource.getLastTaskTime();
   }
 
-  void checkActiveTasks() {
+  Future<void> checkActiveTasks() async {
     _isarTaskDatasource.checkActiveTasks();
   }
 }

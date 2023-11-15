@@ -16,7 +16,7 @@ class WorkExecutorImpl implements WorkExecutor {
     switch (task) {
       case 'red':
       case 'black':
-        final isSuccess = await getIt<NumberRemoteDatasource>().postAddEvent(10, 0);
+        final isSuccess = await getIt<NumberRemoteDatasource>().postAddEvent(10, 70);
 
         return isSuccess;
       default:

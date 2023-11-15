@@ -21,6 +21,16 @@ class WorkManagerConstraint {
         retryCount = retryCount ?? 3,
         backOffPolicy = backOffPolicy ?? BackoffPolicy.exponential;
 
+  factory WorkManagerConstraint.fromDefault() {
+    return const WorkManagerConstraint(
+      initialDelay: Duration(milliseconds: 500),
+      restartDuration: Duration(seconds: 1),
+      isNetworkCheck: false,
+      retryCount: 3,
+      backOffPolicy: BackoffPolicy.exponential,
+    );
+  }
+
   @override
   String toString() {
     return 'WorkManagerConstraint{initialDelay: $initialDelay, '

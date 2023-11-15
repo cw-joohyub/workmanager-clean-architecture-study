@@ -54,7 +54,7 @@ int _dtTaskEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  bytesCount += 3 + object.taskId.length * 3;
+  bytesCount += 3 + object.taskType.length * 3;
   return bytesCount;
 }
 
@@ -65,7 +65,7 @@ void _dtTaskSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeDateTime(offsets[0], object.dateTime);
-  writer.writeString(offsets[1], object.taskId);
+  writer.writeString(offsets[1], object.taskType);
   writer.writeByte(offsets[2], object.taskStatus.index);
 }
 
@@ -77,7 +77,7 @@ DtTask _dtTaskDeserialize(
 ) {
   final object = DtTask(
     dateTime: reader.readDateTime(offsets[0]),
-    taskId: reader.readString(offsets[1]),
+    taskType: reader.readString(offsets[1]),
     taskStatus:
         _DtTasktaskStatusValueEnumMap[reader.readByteOrNull(offsets[2])] ??
             TaskStatus.open,

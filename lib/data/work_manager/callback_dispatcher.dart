@@ -25,7 +25,7 @@ void callbackDispatcher() {
     try {
       constraint = WorkManagerConstraint.fromJsonString(inputData?['constraint'] ?? '');
     } catch (e) {
-      constraint = WorkManagerConstraint(
+      constraint = const WorkManagerConstraint(
         initialDelay: null,
         restartDuration: null,
         isNetworkCheck: null,
@@ -57,30 +57,30 @@ void callbackDispatcher() {
 }
 
 Future<void> handleRetry(String task, DtTask pollTask, WorkManagerConstraint constraint) async {
-  await getIt<IsarTaskDatasource>().writeTaskResult(pollTask.taskId, TaskStatus.failed);
+  await getIt<IsarTaskDatasource>().writeTaskResult(pollTask.id, TaskStatus.failed);
   await getIt<IsarTaskDatasource>().addOpenedTask(pollTask);
 
   await Future<void>.delayed(constraint.restartDuration!);
-  await TaskRequester().registerWorkManager(taskId: task, workManagerConstraint: constraint);
+  await TaskRequester.registerWorkManager(workManagerConstraint: constraint);
 }
 
 Future<void> handleTaskFailure(
     String task, DtTask pollTask, WorkManagerConstraint constraint) async {
-  await getIt<IsarTaskDatasource>().writeTaskResult(pollTask.taskId, TaskStatus.open);
+  await getIt<IsarTaskDatasource>().writeTaskResult(pollTask.id, TaskStatus.open);
 
   final bool isResultExist = await getIt<IsarTaskDatasource>().isTaskExists();
   if (isResultExist) {
-    await TaskRequester().registerWorkManager(taskId: task, workManagerConstraint: constraint);
+    await TaskRequester.registerWorkManager(workManagerConstraint: constraint);
   }
 }
 
 Future<void> handleTaskSuccess(
     String task, DtTask pollTask, WorkManagerConstraint constraint) async {
-  await getIt<IsarTaskDatasource>().writeTaskResult(pollTask.taskId, TaskStatus.done);
+  await getIt<IsarTaskDatasource>().writeTaskResult(pollTask.id, TaskStatus.done);
 
   final bool isResultExist = await getIt<IsarTaskDatasource>().isTaskExists();
   if (isResultExist) {
-    await TaskRequester().registerWorkManager(taskId: task, workManagerConstraint: constraint);
+    await TaskRequester.registerWorkManager(workManagerConstraint: constraint);
   }
 }
 

@@ -1,10 +1,6 @@
 import 'package:injectable/injectable.dart';
-import 'package:workmanager/workmanager.dart';
 import 'package:workmanager_clean_architecture_sample/data/local_isar/dt_task.dart';
-import 'package:workmanager_clean_architecture_sample/data/work_manager/model/work_manager_constraint.dart';
 import 'package:workmanager_clean_architecture_sample/data/work_manager/work_manager_plus.dart';
-
-import '../work_manager/task_requester.dart';
 
 @injectable
 class TaskRepository {
@@ -39,7 +35,6 @@ class TaskRepository {
 
   Future<void> postPlusOne(String taskId) async {
     await _ctWorkManager.addTask(taskId);
-    await _ctWorkManager.registerWorkManager(taskId: taskId);
       // workManagerConstraint: WorkManagerConstraint(
       //   initialDelay: null,
       //   restartDuration: Duration(seconds: 2),

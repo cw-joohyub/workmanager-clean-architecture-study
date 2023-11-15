@@ -24,7 +24,7 @@ class TaskUseCaseImpl extends TaskUseCase {
 
   @override
   Future<void> plusOneNumber(EventType color) async {
-    await _taskRepository.postPlusOne(color);
+    await _taskRepository.postPlusOne(color.name);
   }
 
   @override

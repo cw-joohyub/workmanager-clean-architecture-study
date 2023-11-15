@@ -3,17 +3,24 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:workmanager_clean_architecture_sample/data/mapper/log_event_mapper.dart';
+import 'package:workmanager_clean_architecture_sample/data/work_manager/work_manager_plus.dart';
+import 'package:workmanager_clean_architecture_sample/di/di.dart';
 
 import '../../data/local_isar/dt_task.dart';
 import '../../usecase/task_usecase.dart';
 
+enum EventType {
+  red,
+  black,
+}
+
 class LogEvent {
   String id;
   DateTime dateTime;
-  // EventType eventType;
+  EventType eventType;
   TaskStatus status;
 
-  LogEvent(this.id, this.dateTime, this.status);
+  LogEvent(this.id, this.dateTime, this.status, this.eventType);
 }
 
 class WorkManagerState {
@@ -48,6 +55,8 @@ class WorkManagerCubit extends Cubit<WorkManagerState> {
       : super(WorkManagerState(blackCount: 0, redCount: 0, logEvents: {}));
 
   Future<void> init() async {
+    getIt<WorkManagerPlus>().notifyWorkManager();
+
     List<DtTask> taskList = await _taskUseCase.getTaskList() ?? [];
     emit(state.copyWith(
         redCount: taskList.getDoneTaskCount(EventType.red),
@@ -86,7 +95,7 @@ extension on List<DtTask> {
 
   int getDoneTaskCount(EventType eventType) {
     return where((DtTask task) =>
-            task.eventType == eventType && task.taskStatus == TaskStatus.done)
+            task.taskType == eventType.name && task.taskStatus == TaskStatus.done)
         .length;
   }
 }
